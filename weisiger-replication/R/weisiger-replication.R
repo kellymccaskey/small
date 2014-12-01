@@ -56,6 +56,19 @@ beta.tilde.logit <- mvrnorm(1000, beta.hat.logit, Sigma.logit)
 Sigma.logistf <- vcov(logistf)
 beta.tilde.logistf <- mvrnorm(1000, beta.hat.logistf, Sigma.logistf)
 
+beta.tilde <- function(m, d){
+  beta.hat <- coef(m)
+  Sigma <- vcov(m)
+  beta.tilde <- mvrnorm(1000, beta.hat, Sigma)
+  return(beta.tilde)
+}
+
+fd_sim <- function(beta.tilde){
+  p.tilde <- X.c%*%t(beta.tilde)
+  fd.tilde <- p.tilde[1, ] - p.tilde[2, ]
+  return(fd.tilde)
+}
+
 # OLS first differences
 p.tilde.lpm <- X.c%*%t(beta.tilde.lpm)
 fd.tilde.lpm <- p.tilde.lpm[1, ] - p.tilde.lpm[2, ]
@@ -127,6 +140,11 @@ points(est, ht, pch = 19)
 lines(c(lwr, upr), c(ht,ht))
 text(est, ht, "PMLE w/ MCMC", pos = 3, cex = .8)
 
+# some p-values
+mean(fd.tilde.lpm < 0)
+mean(fd.tilde.logistf < 0)
+mean(fd.tilde.logit < 0)
+mean(fd.tilde.j < 0)
 
 # these are extra checks, you don't need to run these
 
@@ -153,10 +171,4 @@ quantile(fd.tilde.lpm, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logit, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logistf, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.j, c(0.05, 0.50, 0.95))
-
-# some p-values
-mean(fd.tilde.lpm < 0)
-mean(fd.tilde.logistf < 0)
-mean(fd.tilde.logit < 0)
-mean(fd.tilde.j < 0)
 
