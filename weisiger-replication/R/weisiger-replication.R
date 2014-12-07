@@ -48,26 +48,13 @@ X.lo <- c(1, x.polity_conq.dem, x.lndist, x.terrain_alt, x.soldperterr, x.gdppc2
 X.c <- rbind(X.hi, X.lo)
 
 Sigma.lpm <- vcov(lpm)
-beta.tilde.lpm <- mvrnorm(1000, beta.hat.lpm, Sigma.logit)
+beta.tilde.lpm <- mvrnorm(1000, beta.hat.lpm, Sigma.lpm)
 
 Sigma.logit <- vcov(logit)
 beta.tilde.logit <- mvrnorm(1000, beta.hat.logit, Sigma.logit)
 
 Sigma.logistf <- vcov(logistf)
 beta.tilde.logistf <- mvrnorm(1000, beta.hat.logistf, Sigma.logistf)
-
-beta.tilde <- function(m, d){
-  beta.hat <- coef(m)
-  Sigma <- vcov(m)
-  beta.tilde <- mvrnorm(1000, beta.hat, Sigma)
-  return(beta.tilde)
-}
-
-fd_sim <- function(beta.tilde){
-  p.tilde <- X.c%*%t(beta.tilde)
-  fd.tilde <- p.tilde[1, ] - p.tilde[2, ]
-  return(fd.tilde)
-}
 
 # OLS first differences
 p.tilde.lpm <- X.c%*%t(beta.tilde.lpm)
@@ -100,7 +87,7 @@ fd.hat.j <- p.hat.j[1, ] - p.hat.j[2, ]
 # creating Figure 2
 # plot the 90% confidence intervals of the first differences
 par(mfrow = c(1,1), mar = c(3,1,1,1), oma = c(0,0,0,0))
-eplot(xlim = c(-0.5, 1.1), ylim = c(0, 7.5),
+eplot(xlim = c(-0.01, 1), ylim = c(0, 7.5),
       xlab = "90% Confidence Intervals of Coordination First Difference", anny = FALSE)
 abline(v = 0, col = "grey50")
 
