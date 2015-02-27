@@ -10,6 +10,7 @@ library(coda)
 library(texreg)
 library(MASS)
 library(compactr)
+library(boot)
 
 # create variables
 d$terrain_alt <- d$terrain/100
@@ -22,10 +23,16 @@ f <- resist ~ polity_conq + lndist + terrain_alt + soldperterr + gdppc2_alt + co
 lpm <- lm(f, d)
 logit <- glm(f, d, family = binomial)
 logistf <- logistf(f, d)
-# run int-lp-jeffreys and fn-jeffreys-logit first
-jeffreys <- jeffreys.logit(f, d, n.chains = 4, n.sims = 50000, n.burnin = 5000)
-# this will take a while to run. 
-# if it returns an error, try running it again, it's temperamental. 
+
+# create function for bootstrap
+firth <- function(f, data, indices) {
+  data <- d[indices,] # allows boot to select sample 
+  m <- logistf(f, data)
+  return(m$coef) 
+} 
+
+# bootstrap
+bootstrap <- boot(d, statistic = firth, R = 1000, f = f)
 
 # calculate and compare first differences
 # set values to calculate first differences
@@ -77,12 +84,12 @@ hist(fd.tilde.logistf)
 p.hat.logistf <- plogis(X.c%*%(beta.hat.logistf))
 fd.hat.logistf <- p.hat.logistf[1, ] - p.hat.logistf[2, ]
 
-# MCMC first differences
-p.tilde.j <- plogis(X.c%*%t(jeffreys$mcmc))
-fd.tilde.j <- p.tilde.j[1, ] - p.tilde.j[2, ]
-hist(fd.tilde.j)
-p.hat.j <- plogis(X.c%*%t(jeffreys$mcmc))
-fd.hat.j <- p.hat.j[1, ] - p.hat.j[2, ]
+# bootstrap first differences
+p.tilde.b <- plogis(X.c%*%t(bootstrap$t))
+fd.tilde.b <- p.tilde.b[1, ] - p.tilde.b[2, ]
+hist(fd.tilde.b)
+p.hat.b <- plogis(X.c%*%t(bootstrap$t))
+fd.hat.b <- p.hat.b[1, ] - p.hat.b[2, ]
 
 # creating Figure 2
 # plot the 90% confidence intervals of the first differences
@@ -118,32 +125,32 @@ points(est, ht, pch = 19)
 lines(c(lwr, upr), c(ht,ht))
 text(est, ht, "PMLE w/ AA", pos = 3, cex = .8)
 
-# add MCMC
+# add bootstrap
 ht <- 6.5
-est <- median(fd.hat.j)
-lwr <- quantile(fd.tilde.j, 0.05)
-upr <- quantile(fd.tilde.j, 0.95)
+est <- median(fd.hat.b)
+lwr <- quantile(fd.tilde.b, 0.05)
+upr <- quantile(fd.tilde.b, 0.95)
 points(est, ht, pch = 19)
 lines(c(lwr, upr), c(ht,ht))
-text(est, ht, "PMLE w/ MCMC", pos = 3, cex = .8)
+text(est, ht, "PMLE w/ BOOTSTRAPPING", pos = 3, cex = .8)
 
 # some p-values
 mean(fd.tilde.lpm < 0)
 mean(fd.tilde.logistf < 0)
 mean(fd.tilde.logit < 0)
-mean(fd.tilde.j < 0)
+mean(fd.tilde.b < 0)
 
 # these are extra checks, you don't need to run these
 
 # some checks on the Jeffrey's prior simulations
-coda::effectiveSize(jeffreys$mcmc.chains)
-coda::autocorr.plot(jeffreys$mcmc.chains)
-coda::gelman.diag(jeffreys$mcmc.chains)
-coda::gelman.plot(jeffreys$mcmc.chains)
+# coda::effectiveSize(jeffreys$mcmc.chains)
+# coda::autocorr.plot(jeffreys$mcmc.chains)
+# coda::gelman.diag(jeffreys$mcmc.chains)
+# coda::gelman.plot(jeffreys$mcmc.chains)
 
 # compare jeffreys' logit highest posterior density with logistf profile likelihood
-HPDinterval(as.mcmc(jeffreys$mcmc))
-logistf
+# HPDinterval(as.mcmc(jeffreys$mcmc))
+# logistf
 
 # distribution plot of first differences
 plot(density(fd.tilde.logit), main = "Coordination First Differences", 
@@ -151,11 +158,11 @@ plot(density(fd.tilde.logit), main = "Coordination First Differences",
 lines(quantile(fd.tilde.logit, 0.05), lty = 3)
 lines(quantile(fd.tilde.logit, 0.95), lty = 3)
 lines(density(fd.tilde.logistf), col = "grey", lwd = 3)
-lines(density(fd.tilde.j), col = "red", lwd = 2)
+lines(density(fd.tilde.b), col = "red", lwd = 2)
 
 # some confidence intervals
 quantile(fd.tilde.lpm, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logit, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logistf, c(0.05, 0.50, 0.95))
-quantile(fd.tilde.j, c(0.05, 0.50, 0.95))
+quantile(fd.tilde.b, c(0.05, 0.50, 0.95))
 
