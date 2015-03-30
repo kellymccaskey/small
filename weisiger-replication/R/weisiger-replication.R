@@ -1,5 +1,5 @@
 # set working directory
-setwd("~/Dropbox/projects/small/weisiger-replication/")
+setwd("~/Dropbox/projects/small-sample-logit/weisiger-replication/")
 
 # load data
 d <- read.csv("data/conq_ins_data.tab", sep = "\t")
@@ -42,7 +42,9 @@ x.soldperterr <- median(d$soldperterr, na.rm = TRUE)
 x.polity_conq.dem <- 10
 x.polity_conq.aut <- -10
 x.gdppc2_alt <- median(d$gdppc2_alt, na.rm = TRUE)
-x.coord <- median(d$coord, na.rm = TRUE)
+x.coord.hi <- quantile(d$coord, 1, na.rm = TRUE)
+x.coord.lo <- quantile(d$coord, 0, na.rm = TRUE)
+
 
 # calculating first differences
 # creating beta.hats; X.lo, X.hi, and X.c matrices; Sigmas; and beta.tildes
@@ -50,8 +52,8 @@ beta.hat.lpm <- coef(lpm)
 beta.hat.logit <- coef(logit)
 beta.hat.logistf <- coef(logistf)
 
-X.hi <- c(1, x.polity_conq.dem, x.lndist, x.terrain_alt, x.soldperterr, x.gdppc2_alt, quantile(d$coord, 1, na.rm= TRUE))
-X.lo <- c(1, x.polity_conq.dem, x.lndist, x.terrain_alt, x.soldperterr, x.gdppc2_alt, quantile(d$coord, 0, na.rm= TRUE))
+X.hi <- c(1, x.polity_conq.dem, x.lndist, x.terrain_alt, x.soldperterr, x.gdppc2_alt, x.coord.hi)
+X.lo <- c(1, x.polity_conq.dem, x.lndist, x.terrain_alt, x.soldperterr, x.gdppc2_alt, x.coord.lo)
 X.c <- rbind(X.hi, X.lo)
 
 Sigma.lpm <- vcov(lpm)
@@ -88,24 +90,35 @@ fd.hat.logistf <- p.hat.logistf[1, ] - p.hat.logistf[2, ]
 p.tilde.b <- plogis(X.c%*%t(bootstrap$t))
 fd.tilde.b <- p.tilde.b[1, ] - p.tilde.b[2, ]
 hist(fd.tilde.b)
-p.hat.b <- plogis(X.c%*%t(bootstrap$t))
+p.hat.b <- plogis(X.c%*%(beta.hat.logistf))
 fd.hat.b <- p.hat.b[1, ] - p.hat.b[2, ]
 
-# creating Figure 2
+# create first difference plot
 # plot the 90% confidence intervals of the first differences
 par(mfrow = c(1,1), mar = c(3,1,1,1), oma = c(0,0,0,0))
-eplot(xlim = c(-0.01, 1), ylim = c(0, 7.5),
-      xlab = "90% Confidence Intervals of Coordination First Difference", anny = FALSE)
+eplot(xlim = c(-0.01, 1), ylim = c(0, 4.5),
+      xlab = "First Difference", 
+      anny = FALSE,
+      main = "Effect of Coordination")
 abline(v = 0, col = "grey50")
 
-# add OLS
+# add bootstrap
 ht <- 0.5
-est <- median(fd.hat.lpm)
-lwr <- quantile(fd.tilde.lpm, 0.05)
-upr <- quantile(fd.tilde.lpm, 0.95)
+est <- median(fd.hat.b)
+lwr <- quantile(fd.tilde.b, 0.05)
+upr <- quantile(fd.tilde.b, 0.95)
 points(est, ht, pch = 19)
-lines(c(lwr, upr), c(ht, ht))
-text(est, ht, "OLS", pos = 3, cex = .8)
+lines(c(lwr, upr), c(ht,ht))
+text(est, ht, "PMLE w/ bootstrap", pos = 3, cex = .8)
+
+# add PMLE
+ht <- 1.5
+est <- median(fd.hat.logistf)
+lwr <- quantile(fd.tilde.logistf, 0.05)
+upr <- quantile(fd.tilde.logistf, 0.95)
+points(est, ht, pch = 19)
+lines(c(lwr, upr), c(ht,ht))
+text(est, ht, "PMLE w/ asymp. approx.", pos = 3, cex = .8)
 
 # add MLE 
 ht <- 2.5
@@ -116,23 +129,14 @@ points(est, ht, pch = 19)
 lines(c(lwr, upr), c(ht, ht))
 text(est, ht, "MLE", pos = 3, cex = .8)
 
-# add PMLE
-ht <- 4.5
-est <- median(fd.hat.logistf)
-lwr <- quantile(fd.tilde.logistf, 0.05)
-upr <- quantile(fd.tilde.logistf, 0.95)
+# add OLS
+ht <- 3.5
+est <- median(fd.hat.lpm)
+lwr <- quantile(fd.tilde.lpm, 0.05)
+upr <- quantile(fd.tilde.lpm, 0.95)
 points(est, ht, pch = 19)
-lines(c(lwr, upr), c(ht,ht))
-text(est, ht, "PMLE w/ AA", pos = 3, cex = .8)
-
-# add bootstrap
-ht <- 6.5
-est <- median(fd.hat.b)
-lwr <- quantile(fd.tilde.b, 0.05)
-upr <- quantile(fd.tilde.b, 0.95)
-points(est, ht, pch = 19)
-lines(c(lwr, upr), c(ht,ht))
-text(est, ht, "PMLE w/ BOOTSTRAPPING", pos = 3, cex = .8)
+lines(c(lwr, upr), c(ht, ht))
+text(est, ht, "OLS", pos = 3, cex = .8)
 
 # some p-values
 mean(fd.tilde.lpm < 0)
@@ -165,4 +169,6 @@ quantile(fd.tilde.lpm, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logit, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.logistf, c(0.05, 0.50, 0.95))
 quantile(fd.tilde.b, c(0.05, 0.50, 0.95))
+
+
 
