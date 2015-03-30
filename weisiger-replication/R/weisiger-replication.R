@@ -66,30 +66,35 @@ beta.tilde.logistf <- mvrnorm(10000, beta.hat.logistf, Sigma.logistf)
 # OLS first differences
 p.tilde.lpm <- X.c%*%t(beta.tilde.lpm)
 fd.tilde.lpm <- p.tilde.lpm[1, ] - p.tilde.lpm[2, ]
+rr.tilde.lpm <- p.tilde.lpm[1, ]/p.tilde.lpm[2, ]
 hist(fd.tilde.lpm)
 p.hat.lpm <- X.c%*%beta.hat.lpm
 fd.hat.lpm <- p.hat.lpm[1, ] - p.hat.lpm[2, ]
+rr.hat.lpm <- p.hat.lpm[1, ]/p.hat.lpm[2, ]
 
 # MLE first differences
 p.tilde.logit <- plogis(X.c%*%t(beta.tilde.logit))
 fd.tilde.logit <- p.tilde.logit[1, ] - p.tilde.logit[2, ]
+rr.tilde.logit <- p.tilde.logit[1, ]/p.tilde.logit[2, ]
 hist(fd.tilde.logit)
 p.hat.logit <- plogis(X.c%*%(beta.hat.logit))
 fd.hat.logit <- p.hat.logit[1, ] - p.hat.logit[2, ]
+rr.hat.logit <- p.hat.logit[1, ]/p.hat.logit[2, ]
 
 # PMLE first differences
 p.tilde.logistf <- plogis(X.c%*%t(beta.tilde.logistf))
 fd.tilde.logistf <- p.tilde.logistf[1, ] - p.tilde.logistf[2, ]
+rr.tilde.logistf <- p.tilde.logistf[1, ]/p.tilde.logistf[2, ]
 hist(fd.tilde.logistf)
 p.hat.logistf <- plogis(X.c%*%(beta.hat.logistf))
 fd.hat.logistf <- p.hat.logistf[1, ] - p.hat.logistf[2, ]
+rr.hat.logistf <- p.hat.logistf[1, ]/p.hat.logistf[2, ]
 
 # bootstrap first differences
 p.tilde.b <- plogis(X.c%*%t(bootstrap$t))
 fd.tilde.b <- p.tilde.b[1, ] - p.tilde.b[2, ]
+rr.tilde.b <- p.tilde.b[1, ]/p.tilde.b[2, ]
 hist(fd.tilde.b)
-p.hat.b <- plogis(X.c%*%(beta.hat.logistf))
-fd.hat.b <- p.hat.b[1, ] - p.hat.b[2, ]
 
 # create first difference plot
 # plot the 90% confidence intervals of the first differences
@@ -102,7 +107,7 @@ abline(v = 0, col = "grey50")
 
 # add bootstrap
 ht <- 0.5
-est <- median(fd.hat.b)
+est <- fd.hat.logistf
 lwr <- quantile(fd.tilde.b, 0.05)
 upr <- quantile(fd.tilde.b, 0.95)
 points(est, ht, pch = 19)
@@ -135,6 +140,57 @@ upr <- quantile(fd.tilde.lpm, 0.95)
 points(est, ht, pch = 19)
 lines(c(lwr, upr), c(ht, ht))
 text(est, ht, "OLS", pos = 3, cex = .8)
+
+# create risk ratio plot
+# plot the 90% confidence intervals of the first differences
+par(mfrow = c(1,1), mar = c(3,1,1,1), oma = c(0,0,0,0))
+eplot(xlim = log(c(1, 150)), ylim = c(0, 4),
+      xlab = "Risk Ratio", 
+      anny = FALSE,
+      main = "Effect of Coordination",
+      xat = log(c(1, 2, 5, 10, 30, 100)),
+      xticklab = c(1, 2, 5, 10, 30, 100))
+abline(v = 0, col = "grey50")
+
+# add bootstrap
+ht <- 0.5
+est <- rr.hat.logistf
+lwr <- quantile(rr.tilde.b, 0.05)
+upr <- quantile(rr.tilde.b, 0.95)
+points(log(est), ht, pch = 19)
+lines(log(c(lwr, upr)), c(ht,ht))
+text(log(est), ht, "PMLE w/ bootstrap", pos = 3, cex = .8)
+
+# add PMLE
+ht <- 1.5
+est <- rr.hat.logistf
+lwr <- quantile(rr.tilde.logistf, 0.05)
+upr <- quantile(rr.tilde.logistf, 0.95)
+points(log(est), ht, pch = 19)
+lines(log(c(lwr, upr)), c(ht,ht))
+text(log(est), ht, "PMLE w/ asymp. approx.", pos = 3, cex = .8)
+
+# add MLE 
+ht <- 2.5
+est <- rr.hat.logit
+lwr <- quantile(rr.tilde.logit, 0.05)
+upr <- quantile(rr.tilde.logit, 0.95)
+points(log(est), ht, pch = 19)
+lines(log(c(lwr, upr)), c(ht,ht))
+text(log(est), ht, "MLE", pos = 3, cex = .8)
+
+# add OLS
+ht <- 3.5
+est <- rr.hat.lpm
+lwr <- quantile(rr.tilde.lpm, 0.05)
+upr <- quantile(rr.tilde.lpm, 0.95)
+points(log(est), ht, pch = 19)
+text(log(est), ht, "OLS", pos = 3, cex = .8)
+text(log(est), ht, "confidence interval not computable on log scale", pos = 1, cex = .6)
+
+
+
+
 
 # some p-values
 mean(fd.tilde.lpm < 0)
