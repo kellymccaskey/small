@@ -3,7 +3,7 @@
 rm(list = ls())
 
 # set working directory
-setwd("~/Dropbox/projects/small-sample-logit/weisiger-replication/")
+setwd("~/Dropbox/projects/small-sample-logit/")
 
 # load packages
 library(logistf)
@@ -21,7 +21,7 @@ library(scoring)
 # load data
 vars <- c("resist", "polity_conq", "lndist",
           "terrain", "soldperterr", "gdppc2", "coord")
-d <- na.omit(read.csv("data/conq_ins_data.tab", sep = "\t")[, vars])
+d <- na.omit(read.csv("weisiger-replication/data/conq_ins_data.tab", sep = "\t")[, vars])
 
 
 # create variables
@@ -60,20 +60,23 @@ tidy_models <- function(model_list, model_names) {
   return(df)
 }
 models_df <- tidy_models(list(mle, pmle), c("mle", "pmle"))
-ggplot(models_df, aes(var_name, est, 
+
+gg <- ggplot(models_df, aes(var_name, est, 
                       ymin = lwr_90,
                       ymax = upr_90,
                       color = model_name)) + 
   geom_pointrange(width = 0, position = position_dodge(width = 0.2)) +
   coord_flip()
+ggsave("manuscript/figs/weisiger-coefs.pdf", gg)
 
 # plot change in coefficients
 percent_change <- 100*(coef(pmle)/coef(mle) - 1)
 change_df <- data.frame(var_names = names(coef(mle)),
                         percent_change = percent_change)
 change_df$var_names <- reorder(change_df$var_names, change_df$percent_change)
-ggplot(change_df, aes(x = var_names, y = percent_change)) + 
+gg <- ggplot(change_df, aes(x = var_names, y = percent_change)) + 
   geom_bar(stat = "identity") + coord_flip()
+ggsave("manuscript/figs/weisiger-perc-change.pdf", gg)
 
 # in-sample fit
 brier.mle <- brierscore(d$resist ~ predict(mle, type = "response")); mean(brier.mle)
