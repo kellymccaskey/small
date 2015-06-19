@@ -2,6 +2,12 @@
 # clear workspace
 rm(list = ls())
 
+# load packages
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidyr)
+
 # read data
 sims <- read_csv("R/simulations/sims.csv")
 
@@ -65,5 +71,11 @@ gg <- ggplot(sims, aes(x = n, y = mse_coef, color = method)) +
        y = "Mean Squared Error",
        color = "Method"); gg
 ggsave("manuscript/figs/sims-coef-mse.pdf", gg, width = 8, height = 6)
+
+
+## count prop events
+smry <- summarize(group_by(sims, k, b0), p = mean(prop_ones))
+spread(smry, b0, p)
+
 
 
