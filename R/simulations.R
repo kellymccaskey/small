@@ -52,25 +52,33 @@ simulate <- function(n, k, b0, b1, n.sims = 1000) {
            k = k,
            b0 = b0, 
            b1 = b1, 
-           n.sims = n.sims,
+           n_sims = n.sims,
            true_int = true.int,
            true_coef = true.coef,
            method = "MLE",
            e_int = mean(mle.int),
+           sd_int = sd(mle.int),
+           mse_int = mean((mle.int - true.int)^2),
            e_coef = mean(mle.coef),
+           sd_coef = sd(mle.coef),
+           mse_coef = mean((mle.coef - true.coef)^2),
            prop_ones = mean(p))
   # pmle vars
   res2 <- data.frame(n = n,
-            k = k,
-            b0 = b0, 
-            b1 = b1, 
-            n.sims = n.sims,
-            true_int = true.int,
-            true_coef = true.coef,
-            method = "PMLE",
-            e_int = mean(pmle.int),
-            e_coef = mean(pmle.coef),
-            prop_ones = mean(p))
+                     k = k,
+                     b0 = b0, 
+                     b1 = b1, 
+                     n_sims = n.sims,
+                     true_int = true.int,
+                     true_coef = true.coef,
+                     method = "PMLE",
+                     e_int = mean(pmle.int),
+                     sd_int = sd(pmle.int),
+                     mse_int = mean((pmle.int - true.int)^2),
+                     e_coef = mean(pmle.coef),
+                     sd_coef = sd(pmle.coef),
+                     mse_coef = mean((pmle.coef - true.coef)^2),
+                     prop_ones = mean(p))
   # combine mle and pmle rows into single data frame
   res <- rbind(res1, res2) 
   return(res)
@@ -84,16 +92,16 @@ simulate <- function(n, k, b0, b1, n.sims = 1000) {
 k <- c(2, 4, 6)
 
 # set sample sizes
-n <- ceiling(seq(25, 100, length.out = 10))
+n <- ceiling(seq(40, 150, length.out = 10))
 
 # set values of intercept
 b0 <- c(-1, -0.5, 0)
 
 # set values of coefficient of interest
-b1 <- 0.25
+b1 <- 0.5
 
 # number of mc simulations
-n.sims <- 1000
+n.sims <- 10000
 
 # create holder for simulations
 sims <- NULL
