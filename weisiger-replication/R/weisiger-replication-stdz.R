@@ -2,9 +2,6 @@
 # clear working directory
 rm(list = ls())
 
-# set working directory
-setwd("~/Dropbox/projects/small-sample-logit/weisiger-replication/")
-
 # load packages
 library(texreg)
 library(brglm)
@@ -14,8 +11,9 @@ library(arm)
 
 # load data
 vars <- c("resist", "polity_conq", "lndist",
-          "terrain", "soldperterr", "gdppc2", "coord")
-d <- na.omit(read.csv("data/conq_ins_data.tab", sep = "\t")[, vars])
+          "terrain", "soldperterr", "gdppc2", "coord", "default")
+d <- na.omit(read.csv("weisiger-replication/data/conq_ins_data.tab", sep = "\t")[, vars])
+d <- d[d$default == 1, ]
 
 # standardize vars
 for (i in 2:length(vars)) {
@@ -61,9 +59,18 @@ tidy_models <- function(model_list, model_names) {
 }
 models_df <- tidy_models(list(mle, pmle), c("mle", "pmle"))
 
+# plot coefficients
 ggplot(models_df, aes(var_name, est, 
                       ymin = lwr_90,
                       ymax = upr_90,
                       color = model_name)) + 
   geom_pointrange(width = 0, position = position_dodge(width = 0.2)) +
   coord_flip()
+
+# plot change in coefficients
+percent_change <- 100*(coef(pmle)/coef(mle) - 1)
+change_df <- data.frame(var_names = names(coef(mle)),
+                        percent_change = percent_change)
+change_df$var_names <- reorder(change_df$var_names, change_df$percent_change)
+ggplot(change_df, aes(x = var_names, y = percent_change)) + 
+  geom_bar(stat = "identity") + coord_flip()

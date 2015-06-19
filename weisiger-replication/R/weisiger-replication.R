@@ -2,9 +2,6 @@
 # clear working directory
 rm(list = ls())
 
-# set working directory
-setwd("~/Dropbox/projects/small-sample-logit/")
-
 # load packages
 library(logistf)
 library(texreg)
@@ -20,9 +17,11 @@ library(scoring)
 
 # load data
 vars <- c("resist", "polity_conq", "lndist",
-          "terrain", "soldperterr", "gdppc2", "coord")
+          "terrain", "soldperterr", "gdppc2", "coord", "default")
 d <- na.omit(read.csv("weisiger-replication/data/conq_ins_data.tab", sep = "\t")[, vars])
+d <- d[d$default == 1, ]
 
+sort(names(d2))
 
 # create variables
 d$terrain_alt <- d$terrain/100
