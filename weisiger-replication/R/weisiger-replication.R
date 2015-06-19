@@ -3,23 +3,22 @@
 rm(list = ls())
 
 # load packages
-library(logistf)
+library(readr)
 library(texreg)
 library(MASS)
-library(compactr)
-library(boot)
-library(arm)
-library(cvTools)
 library(brglm)
-library(texreg)
 library(scoring)
-
+library(ggplot2)
 
 # load data
 vars <- c("resist", "polity_conq", "lndist",
           "terrain", "soldperterr", "gdppc2", "coord", "default")
-d <- na.omit(read.csv("weisiger-replication/data/conq_ins_data.tab", sep = "\t")[, vars])
+d <- na.omit(read_tsv("weisiger-replication/data/conq_ins_data.tab")[, vars])
 d <- d[d$default == 1, ]
+
+# write data file for example code
+write_csv(d, "weisiger-replication/data/weisiger.csv")
+
 
 sort(names(d2))
 
