@@ -60,7 +60,7 @@ gg <- ggplot(sims, aes(x = n, y = mse_coef, color = method)) +
   geom_point() +
   #geom_smooth(se = FALSE, adjust = 2) +
   facet_grid(k_factor ~ b0_factor) +
-  labs(title = "Variance of the MLE and PMLE Estimators",
+  labs(title = "Mean Squared Error of the MLE and PMLE Estimators",
        x = "Sample Size",
        y = "Mean Squared Error",
        color = "Method"); gg
