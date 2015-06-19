@@ -4,6 +4,7 @@ rm(list = ls())
 
 # load packages
 library(readr)
+library(dplyr)
 library(texreg)
 library(MASS)
 library(brglm)
@@ -16,15 +17,12 @@ vars <- c("resist", "polity_conq", "lndist",
 d <- na.omit(read_tsv("weisiger-replication/data/conq_ins_data.tab")[, vars])
 d <- d[d$default == 1, ]
 
-# write data file for example code
-write_csv(d, "weisiger-replication/data/weisiger.csv")
-
-
-sort(names(d2))
-
 # create variables
 d$terrain_alt <- d$terrain/100
 d$gdppc2_alt <- d$gdppc2/1000
+
+# write data file for example code
+write_csv(d, "weisiger-replication/data/weisiger.csv")
 
 # create function
 f <- resist ~ polity_conq + lndist + terrain_alt + soldperterr + gdppc2_alt + coord

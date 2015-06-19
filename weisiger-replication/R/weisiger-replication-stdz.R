@@ -8,7 +8,6 @@ library(brglm)
 library(scoring)
 library(arm)
 
-
 # load data
 vars <- c("resist", "polity_conq", "lndist",
           "terrain", "soldperterr", "gdppc2", "coord", "default")
