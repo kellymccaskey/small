@@ -77,7 +77,7 @@ gg <- ggplot(models_df, aes(var_name_print, est,
                       ymin = lwr_90,
                       ymax = upr_90,
                       color = model_name)) + 
-  geom_pointrange(width = 0, position = position_dodge(width = 0.2)) +
+  geom_pointrange(width = 0, position = position_dodge(width = 0.4)) +
   coord_flip() + 
   labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
   labs(y = "Logistic Regression Coefficient\n(Variables Standardized)") + 
@@ -138,7 +138,7 @@ gg <- ggplot(isf_df, aes(x = score_type, y = score, fill = method)) +
   labs(x = "Score Type") +
   labs(fill = "Method")
 ggsave("manuscript/figs/weisiger-in-sample-fit.pdf", gg,
-       eight = 3, width = 5)
+       height = 3, width = 5)
 
 # out-sample fit
 n_predict <- nrow(weisiger)
