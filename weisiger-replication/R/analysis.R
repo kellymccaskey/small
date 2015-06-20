@@ -26,24 +26,28 @@ theme <- theme_gray()
 # --------------- #
 
 # load data
+cat("\nreading data...\n\n")
 weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
 
-# create function
-f <- resist ~ polity_conq + lndist + terrain + soldperterr + gdppc2 + coord
-
 # estimate models
+cat("\nestimating models...\n\n")
+f <- resist ~ polity_conq + lndist + terrain + soldperterr + gdppc2 + coord
 mle <- glm(f, data = weisiger, family = "binomial")
 pmle <- brglm(f, data = weisiger, family = "binomial")
-screenreg(list(mle, pmle), stars = 0.1)
+cat(screenreg(list(mle, pmle), stars = 0.1, 
+              custom.model.names = c("MLE", "PMLE")))
 
 # percent change
-perc_change <- 100*(coef(pmle)/coef(mle) - 1); perc_change
+cat("\ncalculating percent change...\n\n")
+perc_change <- 100*(coef(pmle)/coef(mle) - 1)
+print(round(perc_change, 0))
 
 # ------------------------------- #
 # plots of coefficients           #
 # 1 - coefficients themselves     #
 # 2 - changes in the coefficients #
 # ------------------------------- #
+cat("\nplotting the coefficients...\n\n")
 
 # function to tidy the models
 tidy_models <- function(model_list, model_names) {
@@ -71,16 +75,16 @@ tidy_models <- function(model_list, model_names) {
 models_df <- tidy_models(list(mle, pmle), c("ML Estimate", "PML Estimate"))
 
 # add variable names for printing
-var_name_print <- c("Intercept",
+vnp <- c("Intercept",
                     "Conqueror's Polity Score",
                     "log(Intercapital Distance)",
                     "Terrain",
                     "Occupying Force Density",
                     "Per Capita GDP",
                     "Coordinating Leader")
-models_df <- mutate(models_df, var_name_print = rep(var_name_print, 2))
+models_df <- mutate(models_df, var_name_print = rep(vnp, 2))
 models_df <- mutate(models_df, var_name_print = factor(var_name_print, 
-                                                       levels = var_name_print))
+                                                       levels = vnp))
 
 # plot coefficients
 gg <- ggplot(models_df, aes(var_name_print, est, 
@@ -102,7 +106,7 @@ ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
 # plot change in coefficients
 percent_change <- 100*(coef(pmle)/coef(mle) - 1)
 change_df <- data.frame(var_name = names(coef(mle)),
-                        var_name_print = var_name_print,
+                        var_name_print = vnp,
                         percent_change = percent_change)
 change_df <- mutate(change_df, var_name_print = reorder(var_name_print, percent_change))
 gg <- ggplot(change_df, aes(x = var_name_print, y = percent_change)) + 
@@ -120,6 +124,7 @@ ggsave("manuscript/figs/weisiger-perc-change.pdf", gg,
 # 1 - in-sample predictionand plot      #
 # 2 - out-of-sample prediction and plot #
 # ------------------------------------- #
+cat("\ncalculating and plotting model fit...\n\n")
 
 # in-sample fit
 y <- with(weisiger, resist)
@@ -136,7 +141,8 @@ in_sample_fit[1, 1] <- mean(brier_mle)
 in_sample_fit[2, 1] <- mean(brier_pmle)
 in_sample_fit[1, 2] <- mean(log_mle)
 in_sample_fit[2, 2] <- mean(log_pmle)
-in_sample_fit
+cat("\nin-sample fit\n")
+print(in_sample_fit)
 
 # plot in-sample fit
 method <- c("ML", "ML", "PML", "PML")
@@ -180,7 +186,8 @@ out_sample_fit[1, 1] <- mean(brier_mle)
 out_sample_fit[2, 1] <- mean(brier_pmle)
 out_sample_fit[1, 2] <- mean(log_mle)
 out_sample_fit[2, 2] <- mean(log_pmle)
-out_sample_fit
+cat("\nin-sample fit\n")
+print(out_sample_fit)
 
 # plot out-sample fit
 method <- c("ML", "ML", "PML", "PML")
@@ -204,6 +211,7 @@ ggsave("manuscript/figs/weisiger-out-sample-fit.pdf", gg,
 # 3 - risk ratios                   #
 # 4 - combine all into one plot     #
 # --------------------------------- #
+cat("\ncalculating and plotting quantities of interest...\n\n")
 
 # a function to do most of the work
 qi <- function(model, sims, var_name, var_quantiles = c(0, 1)) {
@@ -250,8 +258,10 @@ prob <- c(with(qi_mle_est, p_hi_est),
           with(qi_pmle_est, p_hi_est),
           with(qi_pmle_est, p_lo_est))
 prob_df <- data_frame(method, coord, prob)
+cat("\npredicted probabilities\n")
+print(as.data.frame(prob_df))
 
-# probabilities
+# plot
 prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
 prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
   geom_point() + 
@@ -280,6 +290,10 @@ lwr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .05)),
 upr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .95)),
             with(qi_pmle_sims, quantile(fd_sims, .95)))
 fd_df <- data_frame(method, est, lwr_90, upr_90)
+cat("\nfirst differences\n")
+print(as.data.frame(fd_df))
+
+# plot
 fd_gg <- ggplot(fd_df, aes(method, est, color = method,
                            ymin = lwr_90, ymax = upr_90)) +
   geom_pointrange() +
@@ -306,7 +320,10 @@ lwr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .05)),
 upr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .95)),
             with(qi_pmle_sims, quantile(rr_sims, .95)))
 rr_df <- data_frame(method, est, lwr_90, upr_90)
+cat("\nrisk ratios\n")
+print(as.data.frame(rr_df))
 
+# plot
 rr_gg <- ggplot(rr_df, aes(method, est, color = method,
                            ymin = lwr_90, ymax = upr_90)) +
   geom_pointrange() +
