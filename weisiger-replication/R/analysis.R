@@ -2,6 +2,11 @@
 # clear working directory
 rm(list = ls())
 
+# set seed
+# > runif(1)
+# [1] 0.541404
+set.seed(541404)
+
 # load packages
 library(readr)
 library(dplyr)
@@ -10,6 +15,10 @@ library(MASS)
 library(brglm)
 library(scoring)
 library(ggplot2)
+
+# plot parameters
+ann_size <- 3
+ann_color <- "grey50"
 
 # --------------- #
 # estimate models #
@@ -84,7 +93,7 @@ gg <- ggplot(models_df, aes(var_name_print, est,
   labs(x = NULL) +
   labs(color = "Method") + 
   annotate("text", .7, 10, label = "N = 35 (14 events)", 
-           color = "grey40", size = 3)
+           color = ann_color, size = ann_size)
 ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
        height = 4, width = 8)
 
@@ -238,8 +247,6 @@ prob <- c(with(qi_mle_est, p_hi_est),
 prob_df <- data_frame(method, coord, prob)
 
 # probabilities
-ann_size <- 3
-ann_color <- "grey50"
 prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
 prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
   geom_point() + 
