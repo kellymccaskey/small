@@ -19,6 +19,7 @@ library(ggplot2)
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
+theme <- theme_gray()
 
 # --------------- #
 # estimate models #
@@ -93,7 +94,8 @@ gg <- ggplot(models_df, aes(var_name_print, est,
   labs(x = NULL) +
   labs(color = "Method") + 
   annotate("text", .7, 10, label = "N = 35 (14 events)", 
-           color = ann_color, size = ann_size)
+           color = ann_color, size = ann_size) + 
+  theme
 ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
        height = 4, width = 8)
 
@@ -108,7 +110,8 @@ gg <- ggplot(change_df, aes(x = var_name_print, y = percent_change)) +
   coord_flip() + 
   labs(title = "Percent Change in Logistic Regression Coefficients") + 
   labs(y = "Percent Change from ML Estimates to PML Estimates") + 
-  labs(x = NULL)
+  labs(x = NULL) + 
+  theme
 ggsave("manuscript/figs/weisiger-perc-change.pdf", gg,
        height = 3, width = 6)
 
@@ -145,7 +148,8 @@ gg <- ggplot(isf_df, aes(x = score_type, y = score, fill = method)) +
   labs(title = "In-Sample Prediction Scores") + 
   labs(y = "Score") + 
   labs(x = "Score Type") +
-  labs(fill = "Method")
+  labs(fill = "Method") + 
+  theme
 ggsave("manuscript/figs/weisiger-in-sample-fit.pdf", gg,
        height = 3, width = 5)
 
@@ -188,7 +192,8 @@ gg <- ggplot(osf_df, aes(x = score_type, y = score, fill = method)) +
   labs(title = "Out-of-Sample Prediction Scores") + 
   labs(y = "Score") + 
   labs(x = "Score Type") +
-  labs(fill = "Method")
+  labs(fill = "Method") + 
+  theme
 ggsave("manuscript/figs/weisiger-out-sample-fit.pdf", gg,
        height = 3, width = 5)
 
@@ -260,7 +265,8 @@ prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
            hjust = c(-0.3, 1.3, -0.3, 1.3), 
            vjust = c(0.5, 1.0, 0.5, 0.0), 
            size = ann_size,
-           color = ann_color)
+           color = ann_color) + 
+  theme
 
 # first difference
 method = c("ML", "PML")
@@ -279,14 +285,14 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method,
   geom_pointrange() +
   geom_text(aes(label = round(est, 2)), 
             vjust = -0.5, size = ann_size, color = ann_color) +
-  theme(legend.position = "none") + 
   coord_flip() + 
   labs(title = "First Difference") +
   labs(x = "Method") + 
   labs(y = "First Difference") +
   annotate("text", y = 0.7, x = 0.7, label = caption, 
            size = ann_size,
-           color = ann_color)
+           color = ann_color) + 
+  theme + theme(legend.position = "none") 
 
 # risk ratio
 method = c("ML", "PML")
@@ -306,15 +312,16 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method,
   geom_pointrange() +
   geom_text(aes(label = round(est, 1)), 
             vjust = -0.5, size = ann_size, color = ann_color) +
-  theme(legend.position = "none") + 
   coord_flip() + 
   labs(title = "Risk Ratio") +
   labs(x = "Method") + 
   labs(y = "Risk Ratio") +
   annotate("text", y = 10.7, x = 0.7, label = caption,
            size = ann_size,
-           color = ann_color)
+           color = ann_color) + 
+  theme + theme(legend.position = "none") 
 
+# combine plots
 pdf("manuscript/figs/weisiger-qis.pdf", width = 8, height = 6)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(2, 2)))
