@@ -1,0 +1,325 @@
+
+# clear working directory
+rm(list = ls())
+
+# load packages
+library(readr)
+library(dplyr)
+library(texreg)
+library(MASS)
+library(brglm)
+library(scoring)
+library(ggplot2)
+
+# --------------- #
+# estimate models #
+# --------------- #
+
+# load data
+weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
+
+# create function
+f <- resist ~ polity_conq + lndist + terrain + soldperterr + gdppc2 + coord
+
+# estimate models
+mle <- glm(f, data = weisiger, family = "binomial")
+pmle <- brglm(f, data = weisiger, family = "binomial")
+screenreg(list(mle, pmle), stars = 0.1)
+
+# percent change
+perc_change <- 100*(coef(pmle)/coef(mle) - 1); perc_change
+
+# ------------------------------- #
+# plots of coefficients           #
+# 1 - coefficients themselves     #
+# 2 - changes in the coefficients #
+# ------------------------------- #
+
+# function to tidy the models
+tidy_models <- function(model_list, model_names) {
+  df <- NULL
+  n_models <- length(model_list)
+  for (i in 1:n_models) {
+    model <- model_list[[i]]
+    est <- coef(model)
+    se <- sqrt(diag(vcov(model)))
+    df0 <- data.frame(var_name = names(coef(model)),
+                     est = est,
+                     se = se,
+                     lwr_se = est - se,
+                     upr_se = est + se,
+                     lwr_90 = est - 1.64*se,
+                     upr_90 = est + 1.64*se) 
+    df0$model_name <- model_names[i]
+    df <- rbind(df, df0)
+  }
+  rownames(df) <- NULL
+  return(df)
+}
+
+# tidy model output
+models_df <- tidy_models(list(mle, pmle), c("ML Estimate", "PML Estimate"))
+
+# add variable names for printing
+var_name_print <- c("Intercept",
+                    "Conqueror's Polity Score",
+                    "log(Intercapital Distance)",
+                    "Terrain",
+                    "Occupying Force Density",
+                    "Per Capita GDP",
+                    "Coordinating Leader")
+models_df <- mutate(models_df, var_name_print = rep(var_name_print, 2))
+models_df <- mutate(models_df, var_name_print = factor(var_name_print, 
+                                                       levels = var_name_print))
+
+# plot coefficients
+gg <- ggplot(models_df, aes(var_name_print, est, 
+                      ymin = lwr_90,
+                      ymax = upr_90,
+                      color = model_name)) + 
+  geom_pointrange(width = 0, position = position_dodge(width = 0.2)) +
+  coord_flip() + 
+  labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
+  labs(y = "Logistic Regression Coefficient\n(Variables Standardized)") + 
+  labs(x = NULL) +
+  labs(color = "Method") + 
+  annotate("text", .7, 10, label = "N = 35 (14 events)", 
+           color = "grey40", size = 3)
+ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
+       height = 4, width = 8)
+
+# plot change in coefficients
+percent_change <- 100*(coef(pmle)/coef(mle) - 1)
+change_df <- data.frame(var_name = names(coef(mle)),
+                        var_name_print = var_name_print,
+                        percent_change = percent_change)
+change_df <- mutate(change_df, var_name_print = reorder(var_name_print, percent_change))
+gg <- ggplot(change_df, aes(x = var_name_print, y = percent_change)) + 
+  geom_bar(stat = "identity") + 
+  coord_flip() + 
+  labs(title = "Percent Change in Logistic Regression Coefficients") + 
+  labs(y = "Percent Change from ML Estimates to PML Estimates") + 
+  labs(x = NULL)
+ggsave("manuscript/figs/weisiger-perc-change.pdf", gg,
+       height = 3, width = 6)
+
+# ------------------------------------- #
+# model fit                             #
+# 1 - in-sample predictionand plot      #
+# 2 - out-of-sample prediction and plot #
+# ------------------------------------- #
+
+# in-sample fit
+y <- with(weisiger, resist)
+p_mle <- predict(mle, type = "response")
+p_pmle <- predict(pmle, type = "response")
+brier_mle <- brierscore(y ~ p_mle); mean(brier_mle)
+brier_pmle <- brierscore(y ~ p_pmle); mean(brier_pmle)
+log_mle <- logscore(y ~ p_mle); mean(log_mle)
+log_pmle <- logscore(y ~ p_pmle); mean(log_pmle)
+in_sample_fit <- matrix(NA, nrow = 2, ncol = 2)
+rownames(in_sample_fit) <- c("ML", "PML")
+colnames(in_sample_fit) <- c("Brier Score", "Log Score")
+in_sample_fit[1, 1] <- mean(brier_mle)
+in_sample_fit[2, 1] <- mean(brier_pmle)
+in_sample_fit[1, 2] <- mean(log_mle)
+in_sample_fit[2, 2] <- mean(log_pmle)
+in_sample_fit
+
+# plot in-sample fit
+method <- c("ML", "ML", "PML", "PML")
+score_type <- c("Brier Score", "Log Score", "Brier Score", "Log Score")
+score <- c(mean(brier_mle), mean(log_mle), mean(brier_pmle), mean(log_pmle))
+isf_df <- data_frame(method, score_type, score)
+gg <- ggplot(isf_df, aes(x = score_type, y = score, fill = method)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  labs(title = "In-Sample Prediction Scores") + 
+  labs(y = "Score") + 
+  labs(x = "Score Type") +
+  labs(fill = "Method")
+ggsave("manuscript/figs/weisiger-in-sample-fit.pdf", gg,
+       eight = 3, width = 5)
+
+# out-sample fit
+n_predict <- nrow(weisiger)
+p_mle <- p_pmle <- numeric(n_predict)
+for (i in 1:n_predict) {
+  # partition training and test sets
+  d_train <- weisiger[-i, ]
+  d_test <- weisiger[i, ]
+  # fit models to training data
+  mle0 <- glm(f, d_train, family = "binomial")
+  pmle0 <- brglm(f, d_train, family = "binomial")
+  # predict test set
+  p_mle[i] <- predict(mle0, newdata = d_test, type = "response")
+  p_pmle[i] <- predict(pmle0, newdata = d_test, type = "response")
+}
+
+y <- with(weisiger, resist)
+brier_mle <- brierscore(y ~ p_mle); mean(brier_mle)
+brier_pmle <- brierscore(y ~ p_pmle); mean(brier_pmle)
+log_mle <- logscore(y ~ p_mle); mean(log_mle)
+log_pmle <- logscore(y ~ p_pmle); mean(log_pmle)
+out_sample_fit <- matrix(NA, nrow = 2, ncol = 2)
+rownames(out_sample_fit) <- c("ML", "PML")
+colnames(out_sample_fit) <- c("Brier Score", "Log Score")
+out_sample_fit[1, 1] <- mean(brier_mle)
+out_sample_fit[2, 1] <- mean(brier_pmle)
+out_sample_fit[1, 2] <- mean(log_mle)
+out_sample_fit[2, 2] <- mean(log_pmle)
+out_sample_fit
+
+# plot out-sample fit
+method <- c("ML", "ML", "PML", "PML")
+score_type <- c("Brier Score", "Log Score", "Brier Score", "Log Score")
+score <- c(mean(brier_mle), mean(log_mle), mean(brier_pmle), mean(log_pmle))
+osf_df <- data_frame(method, score_type, score)
+gg <- ggplot(osf_df, aes(x = score_type, y = score, fill = method)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  labs(title = "Out-of-Sample Prediction Scores") + 
+  labs(y = "Score") + 
+  labs(x = "Score Type") +
+  labs(fill = "Method")
+ggsave("manuscript/figs/weisiger-out-sample-fit.pdf", gg,
+       height = 3, width = 5)
+
+# --------------------------------- #
+# quanitities of interest for coord #
+# 1 - predicted probabilities       #
+# 2 - first differences             #
+# 3 - risk ratios                   #
+# 4 - combine all into one plot     #
+# --------------------------------- #
+
+# a function to do most of the work
+qi <- function(model, sims, var_name, var_quantiles = c(0, 1)) {
+  var_values <- quantile(data.frame(weisiger)[, var_name], var_quantiles)
+  X <- set_rest_at_median(f, weisiger, var_name = var_name, 
+                          var_values = var_values)
+  X <- list_to_matrix(X, f)
+  # estimates
+  p <- plogis(X%*%coef(model))
+  p_lo_est <- p[1, ]
+  p_hi_est <- p[2, ]
+  fd_est <- p_hi_est - p_lo_est
+  rr_est <- p_hi_est/p_lo_est
+  est_df <- data_frame(p_lo_est, p_hi_est, fd_est, rr_est)
+  # simulations
+  p <- plogis(X%*%t(sims))
+  p_lo_sims <- p[1, ]
+  p_hi_sims <- p[2, ]
+  fd_sims <- p_hi_sims - p_lo_sims
+  rr_sims <- p_hi_sims/p_lo_sims
+  sims_df <- data_frame(p_lo_sims, p_hi_sims, fd_sims, rr_sims)
+  return(list(est_df = est_df, sims_df = sims_df, X = X))
+}
+
+# simulate coefficients
+sims_mle <- mvrnorm(10000, coef(mle), vcov(mle))
+sims_pmle <- mvrnorm(10000, coef(pmle), vcov(pmle))
+
+# calculate qis
+qi_mle <- qi(mle, sims_mle, "coord")
+qi_mle_est <- with(qi_mle, est_df)
+qi_mle_sims <- with(qi_mle, sims_df)
+qi_pmle <- qi(pmle, sims_pmle, "coord")
+qi_pmle_est <- with(qi_pmle, est_df)
+qi_pmle_sims <- with(qi_pmle, sims_df)
+
+method <- c("ML", "ML", "PML", "PML")
+coord <- c("Coordinating Leader", 
+           "No Coordinating Leader",
+           "Coordinating Leader", 
+           "No Coordinating Leader")
+prob <- c(with(qi_mle_est, p_hi_est),
+          with(qi_mle_est, p_lo_est),
+          with(qi_pmle_est, p_hi_est),
+          with(qi_pmle_est, p_lo_est))
+prob_df <- data_frame(method, coord, prob)
+
+# probabilities
+ann_size <- 3
+ann_color <- "grey50"
+prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
+prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
+  geom_point() + 
+  geom_line(aes(x = as.numeric(coord))) + 
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(title = "Probability of a Post-Conflict Guerrilla War") +
+  labs(x = "Coorinating Leader") + 
+  labs(y = "Probability") +
+  labs(color = "Method") +
+  annotate("text", x = c(2, 1, 2, 1), y = prob, label = round(prob, 2), 
+           hjust = c(-0.3, 1.3, -0.3, 1.3), 
+           vjust = c(0.5, 1.0, 0.5, 0.0), 
+           size = ann_size,
+           color = ann_color)
+
+# first difference
+method = c("ML", "PML")
+est <- c(with(qi_mle_est, fd_est),
+         with(qi_pmle_est, fd_est))
+percent_change <- round(100*(est[2]/est[1] - 1), 0)
+caption <- paste("PML estimate is ", abs(percent_change), 
+                 "% lower\nthan ML estimate.", sep = "")
+lwr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .05)),
+            with(qi_pmle_sims, quantile(fd_sims, .05)))
+upr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .95)),
+            with(qi_pmle_sims, quantile(fd_sims, .95)))
+fd_df <- data_frame(method, est, lwr_90, upr_90)
+fd_gg <- ggplot(fd_df, aes(method, est, color = method,
+                           ymin = lwr_90, ymax = upr_90)) +
+  geom_pointrange() +
+  geom_text(aes(label = round(est, 2)), 
+            vjust = -0.5, size = ann_size, color = ann_color) +
+  theme(legend.position = "none") + 
+  coord_flip() + 
+  labs(title = "First Difference") +
+  labs(x = "Method") + 
+  labs(y = "First Difference") +
+  annotate("text", y = 0.7, x = 0.7, label = caption, 
+           size = ann_size,
+           color = ann_color)
+
+# risk ratio
+method = c("ML", "PML")
+est <- c(with(qi_mle_est, rr_est),
+         with(qi_pmle_est, rr_est))
+percent_change <- round(100*(est[2]/est[1] - 1), 0)
+caption <- paste("PML estimate is ", abs(percent_change), 
+                 "% lower\nthan ML estimate.", sep = "")
+lwr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .05)),
+            with(qi_pmle_sims, quantile(rr_sims, .05)))
+upr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .95)),
+            with(qi_pmle_sims, quantile(rr_sims, .95)))
+rr_df <- data_frame(method, est, lwr_90, upr_90)
+
+rr_gg <- ggplot(rr_df, aes(method, est, color = method,
+                           ymin = lwr_90, ymax = upr_90)) +
+  geom_pointrange() +
+  geom_text(aes(label = round(est, 1)), 
+            vjust = -0.5, size = ann_size, color = ann_color) +
+  theme(legend.position = "none") + 
+  coord_flip() + 
+  labs(title = "Risk Ratio") +
+  labs(x = "Method") + 
+  labs(y = "Risk Ratio") +
+  annotate("text", y = 10.7, x = 0.7, label = caption,
+           size = ann_size,
+           color = ann_color)
+
+pdf("manuscript/figs/weisiger-qis.pdf", width = 8, height = 6)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(2, 2)))
+vplayout <- function(x, y)
+  viewport(layout.pos.row = x, layout.pos.col = y)
+print(prob_gg, vp = vplayout(1, 1:2))
+print(fd_gg, vp = vplayout(2, 1))
+print(rr_gg, vp = vplayout(2, 2))
+dev.off()
+
+
+
+
+
+
