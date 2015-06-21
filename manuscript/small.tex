@@ -44,10 +44,23 @@
 \newenvironment{remark}[1][Remark]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
 
-% Set up fonts the way I like
-\usepackage{tgpagella}
+%% Set up fonts the way I like
+%\usepackage{tgpagella}
+%\usepackage[T1]{fontenc}
+%\usepackage[bitstream-charter]{mathdesign}
+
+%\usepackage{helvet}
+\usepackage[labelfont={bf}, margin=0cm, font=small, skip=0pt]{caption}
+
+% Baskervald
+%\usepackage[lf]{Baskervaldx} % lining figures
+%\usepackage[bigdelims,vvarbb]{newtxmath} % math italic letters from Nimbus Roman
+%\usepackage[cal=boondoxo]{mathalfa} % mathcal from STIX, unslanted a bit
+%\renewcommand*\oldstylenums[1]{\textosf{#1}}
+
 \usepackage[T1]{fontenc}
-\usepackage[bitstream-charter]{mathdesign}
+\usepackage{newtxtext,newtxmath}
+
 
 %% Set up lists the way I like
 % Redefine the first level
@@ -76,15 +89,15 @@
 \definecolor{darkred}{RGB}{100,0,0}
 
 \hypersetup{
- pdftitle={Penalized Maximum Likelihood}, % title
+ pdftitle={Logistic Regression in Small Samples}, % title
  pdfauthor={Kelly McCaskey and Carlisle Rainey}, % author
  pdfkeywords={logit}{probit}{logistic regression} {small sample} {bias}{bootstrap},
  pdfnewwindow=true, % links in new window
  colorlinks=true, % false: boxed links; true: colored links
- linkcolor=darkred, % color of internal links
- citecolor=darkred, % color of links to bibliography
- filecolor=darkred, % color of file links
- urlcolor=darkred % color of external links
+ linkcolor=black, % color of internal links
+ citecolor=black, % color of links to bibliography
+ filecolor=black, % color of file links
+ urlcolor=black % color of external links
 }
 
 % enable comments in pdf
@@ -95,9 +108,10 @@
 \begin{document}
 
 \begin{center}
-{\Large Penalized Maximum Likelihood}\\\vspace{2mm}
-{\normalsize (Nearly) Unbiased Estimation of Logistic Regression Coefficients in Small Samples\symbolfootnote[1]{We thank Alex Weisiger for making his data available to us. We conducted these analyses analyses with \texttt{R} 3.1.0. All data and computer code necessary for replication are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.}}\\\vspace{2mm}
-
+{\Large Logistic Regression in Small Samples}\\\vspace{2mm}
+{\large (Nearly) Unbiased Estimation with Penalized Maximum Likelihood\symbolfootnote[1]{We thank Alex Weisiger for making his data available to us. 
+We conducted these analyses analyses with \texttt{R} 3.1.0. 
+All data and computer code necessary for replication are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.}}\\\vspace{2mm}
 
 \vspace{10mm}
 
@@ -120,15 +134,12 @@ We use Monte Carlo simulations to illustrate that the penalized maximum likeliho
 We illustrate the substantive importance of the penalized estimator with a replication of \cite{Weisiger2014}.
  \end{quote}
 
-
 % Remove page number from first page
 \thispagestyle{empty}
 
 % Start main text
 \newpage
 \doublespace
-
-% three figures
 
 \section*{Introduction}
 
@@ -157,9 +168,30 @@ Taking logs yields the penalized log-likelihood function.
 \begin{equation}\nonumber
 \log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + 0.5 \log |I(\beta)|.
 \end{equation}
-Then the researcher can obtain the \emph{penalized} maximum likelihood estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta \in \mathbb{R}^{k + 1}$ that maximizes $\log L^*$. \citet{Firth1993} shows that $\hat{\beta}^{pmle}$ is much less biased than $\hat{\beta}^{mle}$. The penalized maximum likelihood estimate is easy to calculate in R using the \texttt{logistf()} function in the \texttt{logistf} package. See the Online Appendix for an example.
+Then the researcher can obtain the \emph{penalized} maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta \in \mathbb{R}^{k + 1}$ that maximizes $\log L^*$. 
+\citet{Firth1993} shows that $\hat{\beta}^{pmle}$ is much less biased than $\hat{\beta}^{mle}$. 
+The penalized maximum likelihood estimate is easy to calculate in R using the \texttt{logistf} or \texttt{brglm()} packages. 
+See the Online Appendix Section \ref{sec:pmle-in-R} for an example.
 
-To demonstrate the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$, we calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the sample size, proportion of events, and number of explanatory variables vary. The true data generating process is always $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X_i \beta = \beta_{cons} + 0.25 x_1 + \sum_{j = 2}^k 0.15 x_j$. Each fixed $x_j$ is drawn from a normal distribution with mean of zero and standard deviation of one. The simulation varies the sample size $n$, the number of explanatory variables $k$, and the the intercept $\beta_{cons}$ (which, in turn, varies the proportion of events). The expected values of the MLE  and PMLE of the coefficient $\beta_1$ for $x_1$ are calculated by simulating 10,000 data sets, calculating the MLE and PLME for each data set, and then finding the average of the MLE and PMLE across the 10,000 data sets. Figure \ref{fig:sims-coef-perc-bias} shows the results. The sample size varies across the x-axes of each plot and each panel shows a distinct combination of intercept and number of variables in the model. Across the range of the parameters of our sample, the bias of the MLE varies from about 40\% (intercept equal to -1, 6predictors, 40 observations) to around 3\% (50\% events, 2 predictors, 150 observations). The bias in the PMLE, on the other hand, is barely noticeable, regardless of the simulation parameters. For the worst-case scenario with six variables, 40 observations, and an intercept of -1 (about 11 events), the percent bias in the PMLE is less than one percent--better than the best-case scenario for the MLE.
+\section*{Monte Carlo Simulations}
+
+To demonstrate the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$, we conduct a Monte Carlo simulation comparing the sampling distribution of the ML and PML estimates.
+These simulations demonstrate three features of the ML and PML estimators:
+\begin{enumerate}
+\item The ML estimator can be quite biased in small samples, as much as 50\%, though the bias quickly disappears as the sample size nears and passes 150. The PML is nearly unbiased, regardless of sample size.
+\item The variance of the ML estimator can be twice as large as the PML estimator.
+\item Combining the previous two features, the mean-squared error of the ML estimator is can be 400\% larger than the PML estimator.
+\end{enumerate}
+In our simulation, the true data generating process is always $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X_i \beta = \beta_{cons} + 0.5 x_1 + \sum_{j = 2}^k 0.2 x_j$. 
+We consider $\beta_1$ as the coefficient of interest.
+Each fixed $x_j$ is drawn from a normal distribution with mean of zero and standard deviation of one. 
+The simulation varies the sample size $n$ from 40 to 150, the number of explanatory variables $k \in \{2, 4, 6\}$, and the the intercept $\beta_{cons} \in \{-1, -0.5, 0.0\}$ (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%). 
+We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficient using ML and PML using each.
+We calculate the expected value and variance of the estimates by computing the mean and variance of the ML and PML estimates across the 10,000 data sets.
+
+\subsection*{Bias}
+
+We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the sample size, proportion of events, and number of explanatory variables vary.  Figure \ref{fig:sims-coef-perc-bias} shows the results. The sample size varies across the x-axes of each plot and each panel shows a distinct combination of intercept and number of variables in the model. Across the range of the parameters of our sample, the bias of the MLE varies from about 40\% (intercept equal to -1, 6predictors, 40 observations) to around 3\% (50\% events, 2 predictors, 150 observations). The bias in the PMLE, on the other hand, is barely noticeable, regardless of the simulation parameters. For the worst-case scenario with six variables, 40 observations, and an intercept of -1 (about 11 events), the percent bias in the PMLE is less than one percent--better than the best-case scenario for the MLE.
 
 \begin{figure}[H]
 \begin{center}
@@ -167,6 +199,8 @@ To demonstrate the substantial bias of $\hat{\beta}^{mle}$ and the near unbiased
 \caption{This figure illustrates the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$. Notice that when $N = 40$, the bias of $\hat{\beta}^{mle}$ away from zero is about 40\% or more if events are relatively uncommon (e.g., $\beta_0 = -1$, which leads to about 28\% events) or the researcher uses several explanatory variables (e.g., 6 or more). However, notice that $\hat{\beta}^{pmle}$ is essentially unbiased regardless of the sample size, frequency of events, or number of explanatory variables.}\label{fig:sims-coef-perc-bias}
 \end{center}
 \end{figure}
+
+\subsection*{Variance}
 
 \section*{Replication of Weisiger (2014)}
 
@@ -230,6 +264,34 @@ PMLE & 0.168 & -0.547 \\
 
 By replicating \citet{Weisiger2014}, we demonstrate an appropriate way to use logistic regression with small samples. The original study uses multivariate linear probability regressions on a sample of 35 observations to avoid problems with separation and bias. Using a method of penalized maximum likelihood, with the associated risk ratios, first differences, and the Brier and log scores of out-of-sample predictions, we show that the author would be able to make a stronger case for his argument by obtaining more precise estimates by correcting the bias on the coefficients.
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/weisiger-coefs.pdf}
+\caption{This figure shows the coefficients for a logistic regression model estimated explaining post-conflict guerrilla war estimated with ML and PML. Notice that the PML estimates tend to be much smaller than the ML estimates.}\label{fig:weisiger-coefs}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 1.0]{figs/weisiger-perc-change.pdf}
+\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 1.0]{figs/weisiger-out-sample-fit.pdf}
+\caption{This figure shows the out-of-sample predictive ability (leave-on-out cross-validation) of the ML and PML estimators using both Brier and log scores to measure performance. Higher scores indicate better performance. Notice that the PML estimator out-performs the ML estimator according to both scores. This suggests that the ML estimator is overfitting the data.}\label{fig:weisiger-out-sample-fit}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/weisiger-qis.pdf}
+\caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war. Notice that the PML estimates suggests 19\% smaller first difference and a 24\% smaller risk ratio.}\label{fig:weisiger-qis}
+\end{center}
+\end{figure}
+
 \singlespace 
 \newpage
 \normalsize
@@ -241,13 +303,63 @@ By replicating \citet{Weisiger2014}, we demonstrate an appropriate way to use lo
 \begin{appendix}
 \begin{center}
 {\LARGE Online Appendix}\\
-{\large Practical Advice for Logistic Regression with a Small Sample}\\\vspace{2mm}
+{\large Logistic Regression in Small Samples}\\\vspace{2mm}
 \end{center}
 
 
-\section{Using \texttt{logistf()} to Calculate the PMLE and Confidence Interval}
+\section{Penalized Maximum Likelihood Estimation of Logistic Regression Models in R}\label{sec:pmle-in-R}
 
-\section{Using \texttt{logit.jeffreys()} to Obtain Posterior Simulations Using Jeffreys' Prior}
+\begin{verbatim}
+
+# load data
+library(readr)  # for read_csv()
+weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
+
+# quick look at data
+library(dplyr)  # for glimpse()
+glimpse(weisiger)
+
+# model formula
+f <- resist ~ polity_conq + lndist + terrain_alt + 
+  soldperterr + gdppc2_alt + coord
+
+# ----------------------------- #
+# pmle with the logistf package #
+# ----------------------------- #
+
+# estimate logistic regression with pmle
+library(logistf)  # for logistf()
+m1 <- logistf(f, data = weisiger)
+
+# see coefficient estimates, confidence intervals, p-values, etc.
+summary(m1)
+
+# logistf does **NOT** work with texreg package
+library(texreg)
+screenreg(m1)
+
+# see help file for more
+help(logistf)
+
+# --------------------------- #
+# pmle with the brglm package #
+# --------------------------- #
+
+# estimate logistic regression with pmle
+library(brglm)  # for brglm()
+m2 <- brglm(f, family = binomial, data = weisiger)
+
+# see coefficient estimates, standard errors, p-values, etc.
+summary(m2)
+
+# brglm works with texreg package
+screenreg(m2)
+
+# see help file for more
+help(brglm)
+\end{verbatim}
+
+
 
 \end{appendix}
 
