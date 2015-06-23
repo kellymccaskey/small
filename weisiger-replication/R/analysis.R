@@ -2,7 +2,6 @@
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
-theme <- theme_gray()
 
 # --------------- #
 # estimate models #

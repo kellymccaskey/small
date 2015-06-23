@@ -31,7 +31,7 @@ for (i in 2:length(vars)) {  # start at 2 -> don't rescale binary outcome
   new_temp_var <- rescale(temp_var)
   weisiger[[i]] <- new_temp_var
 }
-#rm(temp_var, new_temp_var)
+rm(temp_var, new_temp_var)
 
 # quick look at cleaned data
 glimpse(weisiger)

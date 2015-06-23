@@ -1,23 +1,8 @@
 
-# clear workspace
-rm(list = ls())
-
-# set seed
-## > runif(1)
-## [1] 0.7358836
-set.seed(7358836)
-
-# load packages
-library(logistf)
-library(MASS)
-library(readr)
-library(dplyr)
-library(ggplot2)
-
 # function to perform simulations
 simulate <- function(n, k, b0, b1, n.sims = 1000) {
   # set progress bar
-  pb <- txtProgressBar(min = 0, max = n.sims, style = 3)
+  # pb <- txtProgressBar(min = 0, max = n.sims, style = 3)
   # set covariates and probabilty
   rho <- 0.0
   sigma <- matrix(rho, k, k); diag(sigma) <- 1
@@ -45,39 +30,35 @@ simulate <- function(n, k, b0, b1, n.sims = 1000) {
       pmle.int[i] <- coef(pmle.fit)[1]
       pmle.coef[i] <- coef(pmle.fit)[2]
     }
-    setTxtProgressBar(pb, i)
+    #setTxtProgressBar(pb, i)
   }
   # mle vars
   res1 <- data.frame(n = n,
-           k = k,
-           b0 = b0, 
-           b1 = b1, 
-           n_sims = n.sims,
-           true_int = true.int,
-           true_coef = true.coef,
-           method = "MLE",
-           e_int = mean(mle.int),
-           sd_int = sd(mle.int),
-           mse_int = mean((mle.int - true.int)^2),
-           e_coef = mean(mle.coef),
-           sd_coef = sd(mle.coef),
-           mse_coef = mean((mle.coef - true.coef)^2),
-           prop_ones = mean(p))
+                     k = k,
+                     b0 = b0, 
+                     b1 = b1, 
+                     n_sims = n.sims,
+                     true_coef = true.coef,
+                     method = "ML",
+                     ev = mean(mle.coef),
+                     bias = mean(mle.coef) - true.coef,
+                     percent_bias = 100*(mean(mle.coef)/true.coef - 1),
+                     var = var(mle.coef),
+                     mse = mean((mle.coef - true.coef)^2),
+                     prop_ones = mean(p))
   # pmle vars
   res2 <- data.frame(n = n,
                      k = k,
                      b0 = b0, 
                      b1 = b1, 
                      n_sims = n.sims,
-                     true_int = true.int,
                      true_coef = true.coef,
-                     method = "PMLE",
-                     e_int = mean(pmle.int),
-                     sd_int = sd(pmle.int),
-                     mse_int = mean((pmle.int - true.int)^2),
-                     e_coef = mean(pmle.coef),
-                     sd_coef = sd(pmle.coef),
-                     mse_coef = mean((pmle.coef - true.coef)^2),
+                     method = "PML",
+                     ev = mean(pmle.coef),
+                     bias = mean(pmle.coef) - true.coef,
+                     percent_bias = 100*(mean(pmle.coef)/true.coef - 1),
+                     var = var(pmle.coef),
+                     mse = mean((pmle.coef - true.coef)^2),
                      prop_ones = mean(p))
   # combine mle and pmle rows into single data frame
   res <- rbind(res1, res2) 
@@ -87,15 +68,17 @@ simulate <- function(n, k, b0, b1, n.sims = 1000) {
 ## ----------------------------------
 ## perform simulations
 ## ----------------------------------
+cat("\n\ndoing simulations...\n\n")
+
 
 # set number of variables
-k <- c(2, 4, 6)
+k <- c(3, 6, 9) #seq(1, 10, by = 1)
 
 # set sample sizes
-n <- ceiling(seq(40, 150, length.out = 10))
+n <- c(30, 60, 90, 120, 150, 180, 210)
 
 # set values of intercept
-b0 <- c(-1, -0.5, 0)
+b0 <- c(-1, -0.5, 0) #seq(-1, 0, by = 0.1)
 
 # set values of coefficient of interest
 b1 <- 0.5
@@ -107,22 +90,27 @@ n.sims <- 10000
 sims <- NULL
 
 # do simulations
+total_iter <- length(b0)*length(k)*length(n)
+iter <- 0
+pb <- txtProgressBar(min = 0, max = total_iter, style = 3)
 for (m in 1:length(b0)) {  # loop over intercepts
-  cat(paste("-- b0 = ", b0[m], "\n"))  # report intercept
+  #cat(paste("-- b0 = ", b0[m], "\n"))  # report intercept
   for (j in 1:length(k)) {  # loop over number of variables 
-    cat(paste("---- k = ", k[j], "\n"))  # report number of variables
+    #cat(paste("---- k = ", k[j], "\n"))  # report number of variables
     for (i in 1:length(n)) {  # loop over sample sizes
-      cat(paste("------ n = ", n[i], "\n"))  # report sample sizes
+      #cat(paste("------ n = ", n[i], "\n"))  # report sample sizes
       sims0 <- simulate(n[i], k[j], b0[m], b1, n.sims = n.sims)  # simulate for given parameters
       sims <- rbind(sims, sims0)  # combine with previous data
-      cat("\n")  # new line
+      #cat("\n")  # new line
+      iter <- iter + 1
+      setTxtProgressBar(pb, iter)
     }
   }
 }
 
 # fix rownames
-rownames(sims) <- NULL
+rownames(sims) <- 1:nrow(sims)
 
 # write data
+cat("\n\nsaving simulations to R/simulations/sims.csv...\n\n")
 write_csv(sims, "R/simulations/sims.csv")
-
