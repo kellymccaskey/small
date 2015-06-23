@@ -1,9 +1,4 @@
 
-# load packages
-library(readr)  # for read_csv()
-library(dplyr)  # for glimpse()
-library(arm)  # for rescale()
-
 # load data
 cat("\nload orginial data...\n\n")
 weisiger_raw <- read_tsv("weisiger-replication/data/weisiger-raw.tab")

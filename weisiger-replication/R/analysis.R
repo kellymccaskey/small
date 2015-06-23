@@ -1,21 +1,4 @@
 
-# clear working directory
-rm(list = ls())
-
-# set seed
-# > runif(1)
-# [1] 0.541404
-set.seed(541404)
-
-# load packages
-library(readr)
-library(dplyr)
-library(texreg)
-library(MASS)
-library(brglm)
-library(scoring)
-library(ggplot2)
-
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
@@ -348,9 +331,3 @@ print(prob_gg, vp = vplayout(1, 1:2))
 print(fd_gg, vp = vplayout(2, 1))
 print(rr_gg, vp = vplayout(2, 2))
 dev.off()
-
-
-
-
-
-
