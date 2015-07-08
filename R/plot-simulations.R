@@ -16,7 +16,8 @@ cat("\n\nmaking and saving plots...\n\n")
 gg <- ggplot(sims, aes(x = n, color = method)) + 
   facet_grid(k_factor ~ b0_factor) +
   theme +
-  labs(x = "Sample Size")
+  labs(x = "Sample Size", 
+  		 color = "Method")
 
 # ev
 gg + geom_line(aes(y = ev)) +
@@ -49,7 +50,7 @@ gg + geom_line(aes(y = mse)) +
 ggsave("manuscript/figs/sims-mse.pdf", width = 8, height = 5)
 
 # variance inflation
-var_df <- select(sims, n, k_factor, b0_factor, var, method)
+var_df <- dplyr::select(sims, n, k_factor, b0_factor, var, method)
 var_infl_df <- spread(var_df, method, var)
 var_infl_df <- mutate(var_infl_df, var_infl = 100*(ML/PML - 1))
 ggplot(var_infl_df, aes(x = n, y = var_infl)) + 
@@ -62,7 +63,7 @@ ggplot(var_infl_df, aes(x = n, y = var_infl)) +
 ggsave("manuscript/figs/sims-var-infl.pdf", width = 8, height = 5)
 
 # mse inflation
-mse_df <- select(sims, n, k_factor, b0_factor, mse, method)
+mse_df <- dplyr::select(sims, n, k_factor, b0_factor, mse, method)
 mse_infl_df <- spread(mse_df, method, mse)
 mse_infl_df <- mutate(mse_infl_df, mse_infl = 100*(ML/PML - 1))
 ggplot(mse_infl_df, aes(x = n, y = mse_infl)) + 

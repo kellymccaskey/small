@@ -1,8 +1,6 @@
 
 # note: make sure that the working directory is set to the project folder.
 
-# bug: this file doesn't seem to run when sourced. hum...
-
 # clear working directory
 rm(list = ls())
 
