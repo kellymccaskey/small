@@ -14,10 +14,19 @@ weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
 # estimate models
 cat("\nestimating models...\n\n")
 f <- resist ~ polity_conq + lndist + terrain + soldperterr + gdppc2 + coord
+ls <- lm(f, data = weisiger)  # linear probability model
 mle <- glm(f, data = weisiger, family = "binomial")
 pmle <- brglm(f, data = weisiger, family = "binomial")
 cat(screenreg(list(mle, pmle), stars = 0.1, 
               custom.model.names = c("MLE", "PMLE")))
+
+# count ls predictions outside [0, 1]
+
+pred <- predict(ls)
+sort(pred)
+sum(pred > 1)
+sum(pred < 0)
+sum(pred < 0 | pred > 1)/length(pred)
 
 # percent change
 cat("\ncalculating percent change...\n\n")

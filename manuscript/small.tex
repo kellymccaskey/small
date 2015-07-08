@@ -195,7 +195,7 @@ We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{t
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width = \textwidth]{figs/sims-coef-perc-bias.pdf}
+\includegraphics[width = \textwidth]{figs/sims-percent-bias.pdf}
 \caption{This figure illustrates the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$. Notice that when $N = 40$, the bias of $\hat{\beta}^{mle}$ away from zero is about 40\% or more if events are relatively uncommon (e.g., $\beta_0 = -1$, which leads to about 28\% events) or the researcher uses several explanatory variables (e.g., 6 or more). However, notice that $\hat{\beta}^{pmle}$ is essentially unbiased regardless of the sample size, frequency of events, or number of explanatory variables.}\label{fig:sims-coef-perc-bias}
 \end{center}
 \end{figure}
@@ -204,86 +204,80 @@ We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{t
 
 \section*{Replication of Weisiger (2014)}
 
-\citet{Weisiger2014} explains that conquerors in conventional wars cannot expect to win over the defeated population. Additionally, he describes how sometimes violence continues after the official end of the war in the form of guerrilla warfare instead. Weisiger argues that if resistance occurs, it will be where conditions are favorable for insurgency, such as, difficult terrain, the size and concentration of the occupying force, or if there remains a pre-war leader for potential insurgents to rally around. He hypothesizes that there will be a greater chance of resistance when the pre-conflict political leader ``remains at large in the conquered country" (p. 8).
+To illustrate the potential importance of using the nearly unbiased PML estimator, we replicate a portion of the statistical analysis in \cite{Weisiger2014}. 
+Weisiger explains that conquerors in conventional wars cannot expect to win over the defeated population and he describes how sometimes violence continues after the official end of the war in the form of guerrilla warfare instead. 
+Weisiger argues that resistance is more likely when conditions are favorable for insurgency, such as difficult terrain, the size and concentration of the occupying force, or if there remains a pre-war leader for potential insurgents to rally around. 
+We focus on his hypothesis that there will be a greater chance of resistance when the pre-conflict political leader ``remains at large in the conquered country" (p. 8).
 
-Weisiger's sample consists of 49 observations so the original analysis uses multivariate linear probability regressions to test his hypotheses. He does so in order to avoid problems with separation and biases that may occur with his small sample if he were to use the standard logit or probit analysis. He acknowledges the limitations to using multivariate linear probability regressions in this situation by noting that the method introduces the possibility of estimating non-meaningful predicted probabilities outside the [0, 1] range. We replicate his results and are able to correct the bias of the coefficient estimates using PMLE. Table \ref{tab:coef} shows the coefficient estimates using MLE, PMLE, and the percent change between the two. Notice that MLE substantially over-estimates many of the coefficients 30 percent or more.
+Weisiger's sample consists of 35 observations (with 14 insurgencies). In the orginal analysis, Weisiger uses a linear probability model. He writes:
 
-\begin{table}
-\begin{center}
-\caption{MLE and PMLE Comparison}\label{tab:coef}
-\begin{tabular}{l c c c}
-\hline
-               & MLE & PMLE & Percent Change\\
-\hline
-Constant & $-8.20$ & $-6.54$ & -20 \\
-               & $(5.63)$ & $(4.73)$ \\
-Conqueror's Polity Score & $-0.10$ & $-0.07$ & -30 \\
-               & $(0.10)$ & $(0.09)$ \\
-Distance & $1.06$ & $0.80$ &-24 \\
-               & $(0.71)$ & $(0.60)$ \\
-Terrain & $2.11$ & $1.74$ &-18 \\
-               & $(2.49)$ & $(2.23)$ \\
-Occupying Army Density & $-0.07$ & $-0.09$ & 31\\
-               & $(0.22)$ & $(0.20)$ \\
-GDP per capita & $-1.02$ & $-0.58$ & -43 \\
-               & $(0.73)$ & $(0.46)$ \\
-Coordination & $2.19^{*}$ & $1.72^{*}$ & -21\\
-               & $(1.07)$ & $(0.94)$ \\
-\hline
-%AIC & 49.62 & 50.75 \\
-%BIC & 62.87 & 63.99 \\
-%Log Likelihood & -17.81 & -18.38 \\
-%Deviance & 35.62 & 36.75 \\
-%Num. obs. & 49 & 49 \\
-\hline
-\multicolumn{3}{l}{\scriptsize Notes: {$^*p<0.1$}, standard errors in parentheses.}
-\end{tabular}
-\end{center}
-\end{table}
+\begin{quote}
+For multivariate analysis I make use of a linear probability model, which avoids problems with separation but introduces the possibility of non-meaningful predicted probabilities outside the [0,1] range (p. 11).
+\end{quote}
 
-The use of a logit analysis implies that we are more interested in the functions of the coefficients rather than the coefficients themselves, so we calculated the first differences and the risk ratios for his hypothesis about the presence of the pre-conquest political leader. To do so, we evaluated the difference in the probability of resistance from a situation where there a pre-conquest leader did not remain to a situation where one did remain. We then set the Polity score of the Conqueror to 10, a full democracy, and the rest of the variables at their medians.\footnote{These include: the natural log of the intercapital distance, the type of terrain, the density of the occupying force and the conquered country's per capita GDP.} We did then calculate the first difference and the risk ratio for both the standard MLE and the PMLE.
+As Weisiger notes, predictions outside the $[0, 1]$ interval pose a problem for interpreting the linear probability model.\footnote{We should also note that the PML estimates also solve the problem with separation. See \cite{Zorn2005} and \cite{Rainey-separation}.} 
+For example, in one case the linear probability model estimates a probability of 1.41 of insurgency. 
+In another, it estimates a probability of -0.22. 
+Of course, these results are nonsense. 
+However, because of the well-known small-sample bias, methodologists discourage researchers from using logistic regression with small samples.
+The PML approach, though, solves the problem of bias as well as nonsense predictions.
 
-The values of the quantities of interest of the PMLE decrease in comparison to those of the standard MLE. Using the standard MLE, resistance in a situation where the pre-conquest leader remains is 4.96 times more likely than where the pre-conquest leader does not remain. Using the PMLE, we see the risk ration decrease to 3.25. Similarly, we see the first differences for the same situational change also decrease when using the PMLE instead of the standard MLE. Using the PMLE, the likelihood of resistance in going from a scenario in which the pre-conquest leader remains to one in which none remain decreases by 35 percentage points. With the standard MLE, the likelihood decreases by 40 percentage points. We are then able to calculate our confidence intervals using Clarify or Clarify-like simulations. As with the change in coefficients previously demonstrated in Table \ref{tab:coef}, the changes in the quantities of interest when one uses the PMLE as opposed to the standard MLE, the PMLE corrects for the tendency for coefficients produced by the standard MLE to be biased away from zero.
+\subsection*{Coefficient Estimates}
 
-Because we do not know the true model, we can use out-of-sample predictions as the best way to judge. Table \ref{tab:scores} displays both the Brier and the log scores for the standard MLE and for the PMLE. Both scoring methods indicate that the PMLE is a better predictor than the standard MLE. The Brier score $B$ is calculated as $B = \sum_{i = 1}^n (y_i - p_i)^2$, where $i$ indexes the observations, $y_i \in \{0, 1\}$ represents the actual outcome, and $p_i \in (0, 1)$ represents the estimated probability that $y_i = 1$. The log score is calculated as $\sum_{i = 1}^n log(r_i)$, where $r_i = y_i p_i + (1 - y_i)(1 - p_i)$. 
-
-\singlespace
-\begin{table}[H]
-\begin{center}
-\begin{tabular}{| c | c | c |}
-\hline
-Estimation Technique & Brier Score & Log Score \\
-\hline
-MLE & 0.173 & -0.621 \\
-PMLE & 0.168 & -0.547 \\
-\hline
-\end{tabular}\caption{This table compares the Brier and log scores of out-of-sample predictions using MLE and PMLE. Notice that PMLE out-performs MLE according to both measures.}\label{tab:scores}
-\end{center}
-\end{table}
-\doublespace
-
-By replicating \citet{Weisiger2014}, we demonstrate an appropriate way to use logistic regression with small samples. The original study uses multivariate linear probability regressions on a sample of 35 observations to avoid problems with separation and bias. Using a method of penalized maximum likelihood, with the associated risk ratios, first differences, and the Brier and log scores of out-of-sample predictions, we show that the author would be able to make a stronger case for his argument by obtaining more precise estimates by correcting the bias on the coefficients.
+We re-analyze Weisiger's data using logistic regression to show the substantial difference between the biased ML estimates and the unbiased PML estimates. 
+Figure \ref{fig:weisiger-coefs} shows the coefficient estimates and 90\% confidence intervals using ML and PML. 
+Notice that the unbiased PML estimates are substantially smaller in many cases.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/weisiger-coefs.pdf}
-\caption{This figure shows the coefficients for a logistic regression model estimated explaining post-conflict guerrilla war estimated with ML and PML. Notice that the PML estimates tend to be much smaller than the ML estimates.}\label{fig:weisiger-coefs}
+\caption{This figure shows the coefficients for a logistic regression model estimated explaining post-conflict guerrilla war estimated with ML and PML. 
+Notice that the PML estimates tend to be much smaller than the ML estimates.}\label{fig:weisiger-coefs}
 \end{center}
 \end{figure}
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 1.0]{figs/weisiger-perc-change.pdf}
-\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
-\end{center}
-\end{figure}
+Figure \ref{fig:weisiger-perc-change} shows the percentage change from the ML estimator to the PML estimator. 
+Although the coefficient for terrain only changes by 16\%, each of the remaining coefficients changes by more than 45\%! The coefficient for per capita GDP shrinks by more the 60\% and the coefficient for occupying force density grows by nearly 100\%.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale = 1.0]{figs/weisiger-out-sample-fit.pdf}
+\includegraphics[scale = 0.7]{figs/weisiger-perc-change.pdf}
+\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. 
+Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. 
+All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
+\end{center}
+\end{figure}
+
+\subsection*{Out-of-Sample Fit}
+
+Because we do not know the true model, we cannot know which of these sets of coefficient is best. However, we can use out-of-sample prediction to help adjudicate between these two methods. We use leave-one-out cross-validation and summarize the prediction errors using Brier and log scores. The procedure works as follows:
+
+\begin{enumerate}
+\item Choose an observation $i$ to predict.
+	\begin{enumerate}
+	\item Create a training data set ($N = 34$) by dropping observation $i$ from the full data set ($N = 35$).
+	\item Estimate the the logistic regression model using both ML and PML using the training data.
+	\item Estimate the probability of an event (i.e., insurgency) for observation $i$. Store this estimate as $p_i$.
+	\end{enumerate}
+\item Repeat Step 1 for each observation in the full data set to obtain a full vector of out-of-sample predictions $p$.
+\item Calculate the Frier score $B$ as $B = \sum_{i = 1}^n (y_i - p_i)^2$, where $i$ indexes the observations, $y_i \in \{0, 1\}$ represents the actual outcome, and $p_i \in (0, 1)$ represents the estimated probability that $y_i = 1$. This corresponds to the mean squared errors, so larger values indicate a worse fit.
+\item Calculate the log score as $-\sum_{i = 1}^n log(r_i)$, where $r_i = y_i p_i + (1 - y_i)(1 - p_i)$. Notice that because we are logging $r_i \in [0, 1]$, $\sum_{i = 1}^n log(r_i)$ is always negative and smaller (i.e., more negative) values indicate worse fit. We choose to take the negative of $\sum_{i = 1}^n log(r_i)$, so that, like the Brier score, larger values indicate a worse fit.
+\end{enumerate}
+
+\noindent Figure \ref{fig:weisiger-out-sample-fit} shows the Brier and log scores for the two sets of estimates. PML estimates outperform the ML estimates with both approach to scoring.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.7]{figs/weisiger-out-sample-fit.pdf}
 \caption{This figure shows the out-of-sample predictive ability (leave-on-out cross-validation) of the ML and PML estimators using both Brier and log scores to measure performance. Higher scores indicate better performance. Notice that the PML estimator out-performs the ML estimator according to both scores. This suggests that the ML estimator is overfitting the data.}\label{fig:weisiger-out-sample-fit}
 \end{center}
 \end{figure}
+
+\subsection*{Quantities of Interest}
+
+Because we are using a logistic regression, we might be more interested in \textit{functions} of the coefficients rather than the coefficients themselves. 
+Setting all other explanatory variables at their sample medians, we calculated the predicted probabilities, the first difference, and the risk ratio for the probability of a post-conflict guerrilla war as countries gain a coordinating leader. 
+Figure \ref{fig:weisiger-qis} shows the estimates of the quantities of interest.
 
 \begin{figure}[H]
 \begin{center}
@@ -291,6 +285,16 @@ By replicating \citet{Weisiger2014}, we demonstrate an appropriate way to use lo
 \caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war. Notice that the PML estimates suggests 19\% smaller first difference and a 24\% smaller risk ratio.}\label{fig:weisiger-qis}
 \end{center}
 \end{figure}
+
+PML pools the estimated probabilities toward zero. 
+When a country lacks a coordinating leader, ML suggests a 23\% chance of rebellion while PML suggests a 28\% chance. 
+On the other hand, when country \textit{does have} a coordinating leader, ML suggests a 99\% chance of rebellion of 0.99, but PML lowers this to 89\%. 
+Accordingly, PML suggests smaller effect sizes, whether using a first difference or risk ratio. 
+PML shrinks the estimated first difference by 19\% from 0.75 to 0.61. 
+It shrinks the risk ration by 24\% from 4.2 to 3.2.  
+
+By re-analyzing data from \cite{Weisiger2014}, we demonstrate an improved method of estimating logistic regression coefficients, especially with small samples. 
+In small samples, maximum likelihood is substantially biased upward, but \textit{penalized} maximum likelihood is nearly unbiased. These reductions in bias do not come at a large cost. Though perhaps more subtle and theoretically difficult that maximum likelihood, penalized maximum likelihood is just as easy to use in practice.
 
 \singlespace 
 \newpage
