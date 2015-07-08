@@ -4,8 +4,12 @@
 # clear working directory
 rm(list = ls())
 
+# some options
+install_packages <- FALSE
+run_sims <- FALSE  # it takes about 5 hours to run these
+theme <- theme_gray()
+
 # install packages
-install_packages <- TRUE
 if (install_packages == TRUE) {
   # install packages from CRAN
   install.packages(c("readr", "dplyr", "tidyr", "ggplot2", "arm", "texreg",
@@ -32,10 +36,6 @@ library(separation)  # for calculating qis (from GitHub)
 # > runif(1)
 # [1] 0.541404
 set.seed(541404)
-
-# global parameters
-run_sims <- TRUE  # it takes about 5 hours to run these
-theme <- theme_gray()
 
 # ----------------------- #
 # monte carlo simulations #
