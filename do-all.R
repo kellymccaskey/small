@@ -4,6 +4,17 @@
 # clear working directory
 rm(list = ls())
 
+# install packages
+install_packages <- TRUE
+if (install_packages == TRUE) {
+  # install packages from CRAN
+  install.packages(c("readr", "dplyr", "tidyr", "ggplot2", "arm", "texreg",
+                     "brglm", "scoring"))
+  # install packages from github
+  install.packages("devtools")
+  devtools::install_github("carlislerainey/separation")
+}
+
 # load packages
 library(readr)  # for read_csv() and write_csv()
 library(dplyr)  # for data management
