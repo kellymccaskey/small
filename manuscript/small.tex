@@ -186,7 +186,7 @@ In our simulation, the true data generating process is always $\Pr(y_i = 1) = \f
 We consider $\beta_1$ as the coefficient of interest.
 Each fixed $x_j$ is drawn from a normal distribution with mean of zero and standard deviation of one. 
 The simulation varies the sample size $n$ from 40 to 150, the number of explanatory variables $k \in \{2, 4, 6\}$, and the the intercept $\beta_{cons} \in \{-1, -0.5, 0.0\}$ (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%). 
-We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficient using ML and PML using each.
+We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficient using ML and PML for each data set.
 We calculate the expected value and variance of the estimates by computing the mean and variance of the ML and PML estimates across the 10,000 data sets.
 
 \subsection*{Bias}
@@ -307,25 +307,74 @@ In small samples, maximum likelihood is substantially biased upward, but \textit
 \begin{appendix}
 \begin{center}
 {\LARGE Online Appendix}\\
+\vspace{3mm}
 {\large Logistic Regression in Small Samples}\\\vspace{2mm}
 \end{center}
 
+\section{Additional Simulation Results}\label{sec:app-sims}
+
+\subsection{Expected Value}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-ev.pdf}
+\caption{This figure shows the expected value of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$. The true value is $\beta = 0.5$.}\label{fig:ev}
+\end{center}
+\end{figure}
+
+\subsection{Bias}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-bias.pdf}
+\caption{This figure shows the bias of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:bias}
+\end{center}
+\end{figure}
+
+\subsection{Mean Squared Error}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
+\caption{This figure shows the mean squared error of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:mse}
+\end{center}
+\end{figure}
+
+\subsection{Variance Inflation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
+\caption{This figure shows the percent inflation in the variance of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:var-infl}
+\end{center}
+\end{figure}
+
+\subsection{Mean Squared Error Inflation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-mse-infl.pdf}
+\caption{This figure shows the percent increase in the mean square error of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:mse}
+\end{center}
+\end{figure}
 
 \section{Penalized Maximum Likelihood Estimation of Logistic Regression Models in R}\label{sec:pmle-in-R}
 
+This example code is available at \href{https://github.com/kellymccaskey/small/blob/master/R/example.R}{https://github.com/kellymccaskey/small/blob/master/R/example.R}.
+
 \begin{verbatim}
 
-# load data
+# load data from web
 library(readr)  # for read_csv()
-weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
+weisiger <- read_csv("https://raw.githubusercontent.com/kellymccaskey/small/master/weisiger-replication/data/weisiger.csv") 
 
 # quick look at data
 library(dplyr)  # for glimpse()
 glimpse(weisiger)
 
 # model formula
-f <- resist ~ polity_conq + lndist + terrain_alt + 
-  soldperterr + gdppc2_alt + coord
+f <- resist ~ polity_conq + lndist + terrain + 
+  soldperterr + gdppc2 + coord
 
 # ----------------------------- #
 # pmle with the logistf package #
