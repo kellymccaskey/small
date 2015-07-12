@@ -242,8 +242,6 @@ To illustrate the potential importance of using the nearly unbiased PML estimato
 Weisiger describes how, after the official end of the war, violence sometimes continues in the form of guerrilla warfare. 
 He argues that resistance is more likely when conditions are favorable for insurgency, such as difficult terrain, a occupying force, or a pre-war leader remains at-large in the country. 
 
-%\subsection*{Coefficient Estimates}
-
 Weisiger's sample consists of 35 observations (with 14 insurgencies). 
 We re-analyze Weisiger's data using logistic regression to show the substantial difference between the biased ML estimates and the nearly unbiased PML estimates. Weisiger uses a linear probability model for this analysis, but that leads to the probabilities that fall outside the $[0, 1]$ interval.\footnote{Specifically, we re-analyze the Model 3 in Weisiger's Table 2 (p. 14). 
 In the original analysis, Weisiger uses a linear probability model. 
@@ -269,19 +267,6 @@ Notice that the PML estimates tend to be much smaller than the ML estimates.}\la
 \end{center}
 \end{figure}
 
-%Figure \ref{fig:weisiger-perc-change} shows the percentage change from the ML estimator to the PML estimator. 
-
-%\begin{figure}[H]
-%\begin{center}
-%\includegraphics[scale = 0.7]{figs/weisiger-perc-change.pdf}
-%\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. 
-%Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. 
-%All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
-%\end{center}
-%\end{figure}
-
-%\subsection*{Out-of-Sample Fit}
-
 Because we do not know the true model, we cannot know which of these sets of coefficient is best. 
 However, we can use out-of-sample prediction to help adjudicate between these two methods. 
 We use leave-one-out cross-validation and summarize the prediction errors using Brier and log scores, for which larger values indicate worse predictive ability.\footnote{The Brier score is calculated as $\sum_{i = 1}^n (y_i - p_i)^2$, where $i$ indexes the observations, $y_i \in \{0, 1\}$ represents the actual outcome, and $p_i \in (0, 1)$ represents the estimated probability that $y_i = 1$. 
@@ -292,28 +277,10 @@ The ML estimates produce a Brier score of 0.14, and the PML estimates lower the 
 The ML estimates produce a log score of 0.58, while the PML estimates lower the log score by 34\% to 0.38. 
 The PML estimates outperform the ML estimates for both approaches to scoring.
 This provides good evidence that the PML estimates better capture the data generating process.
- 
-%\noindent Figure \ref{fig:weisiger-out-sample-fit} shows the Brier and log scores for the two sets of estimates. 
-
-%\begin{figure}[H]
-%\begin{center}
-%\includegraphics[scale = 0.7]{figs/weisiger-out-sample-fit.pdf}
-%\caption{This figure shows the out-of-sample predictive ability (leave-on-out cross-validation) of the ML and PML estimators using both Brier and log scores to measure performance. Higher scores indicate better performance. Notice that the PML estimator out-performs the ML estimator according to both scores. This suggests that the ML estimator is overfitting the data.}\label{fig:weisiger-out-sample-fit}
-%\end{center}
-%\end{figure}
 
 Because we are using a logistic regression, we might be more interested in \textit{functions} of the coefficients than the coefficients themselves. 
 In this example, we focus on Weisiger's hypothesis that there will be a greater chance of resistance when the pre-conflict political leader remains at large in the conquered country.
 Setting all other explanatory variables at their sample medians, we calculated the predicted probabilities, the first difference, and the risk ratio for the probability of a post-conflict guerrilla war as countries gain a coordinating leader.
- 
-%Figure \ref{fig:weisiger-qis} shows the estimates of the quantities of interest.
-%
-%\begin{figure}[H]
-%\begin{center}
-%\includegraphics[width = \textwidth]{figs/weisiger-qis.pdf}
-%\caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war. Notice that the PML estimates suggests 19\% smaller first difference and a 24\% smaller risk ratio.}\label{fig:weisiger-qis}
-%\end{center}
-%\end{figure}
 
 PML pools the estimated probabilities toward zero. 
 When a country lacks a coordinating leader, ML suggests a 23\% chance of rebellion while PML suggests a 28\% chance. 
