@@ -79,20 +79,21 @@ models_df <- mutate(models_df, var_name_print = factor(var_name_print,
 
 # plot coefficients
 gg <- ggplot(models_df, aes(var_name_print, est, 
-                      ymin = lwr_90,
-                      ymax = upr_90,
-                      color = model_name)) + 
-  geom_pointrange(width = 0, position = position_dodge(width = 0.4)) +
-  coord_flip() + 
-  labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
-  labs(y = "Logistic Regression Coefficient\n(Variables Standardized)") + 
-  labs(x = NULL) +
-  labs(color = "Method") + 
-  annotate("text", .7, 10, label = "N = 35 (14 events)", 
-           color = ann_color, size = ann_size) + 
-  theme
+														ymin = lwr_90,
+														ymax = upr_90,
+														color = model_name,
+														linetype = model_name)) + 
+	geom_pointrange(width = 0, position = position_dodge(width = 0.4)) +
+	coord_flip() + 
+	labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
+	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 
+	labs(x = NULL) +
+	labs(color = "Method", linetype = "Method") + 
+	annotate("text", .7, 10, label = "N = 35 (14 events)", 
+					 color = ann_color, size = ann_size) + 
+	theme
 ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
-       height = 4, width = 8)
+			 height = 4, width = 9)
 
 # plot change in coefficients
 percent_change <- 100*(coef(pmle)/coef(mle) - 1)

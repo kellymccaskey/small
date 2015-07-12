@@ -28,9 +28,9 @@ library(arm)  # for rescale()
 library(texreg)  # for printing tables of coefs
 library(MASS)  # for mvrnorm()
 library(brglm)  # for pmle
+library(logistf)  # for pmle
 library(scoring)  # for Brier- and log-scores
 library(separation)  # for calculating qis (from GitHub)
-library(logistf)
 
 # set seed
 # > runif(1)
@@ -38,7 +38,7 @@ library(logistf)
 set.seed(541404)
 
 # ggplot theme to use throughout
-theme <- theme_gray()
+theme <- theme_bw()
 
 # ----------------------- #
 # monte carlo simulations #

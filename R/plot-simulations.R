@@ -13,11 +13,11 @@ sims <- mutate(sims, b0_factor = reorder(b0_factor, prop_ones))
 
 # basic plot
 cat("\n\nmaking and saving plots...\n\n")
-gg <- ggplot(sims, aes(x = n, color = method)) + 
+gg <- ggplot(sims, aes(x = n, color = method, linetype = method)) + 
   facet_grid(k_factor ~ b0_factor) +
   theme +
   labs(x = "Sample Size", 
-  		 color = "Method")
+  		 color = "Method", linetype = "Method")
 
 # ev
 gg + geom_line(aes(y = ev)) +
