@@ -7,7 +7,6 @@ rm(list = ls())
 # some options
 install_packages <- FALSE
 run_sims <- FALSE  # it takes about 5 hours to run these
-theme <- theme_gray()
 
 # install packages
 if (install_packages == TRUE) {
@@ -31,11 +30,15 @@ library(MASS)  # for mvrnorm()
 library(brglm)  # for pmle
 library(scoring)  # for Brier- and log-scores
 library(separation)  # for calculating qis (from GitHub)
+library(logistf)
 
 # set seed
 # > runif(1)
 # [1] 0.541404
 set.seed(541404)
+
+# ggplot theme to use throughout
+theme <- theme_gray()
 
 # ----------------------- #
 # monte carlo simulations #

@@ -32,7 +32,7 @@ gg + geom_line(aes(y = bias)) +
 ggsave("manuscript/figs/sims-bias.pdf", width = 8, height = 5)
 
 # percent bias
-gg + geom_line(aes(y = ev)) +
+gg + geom_line(aes(y = percent_bias)) +
   labs(y = "Percent Bias") +
   labs(title = "Percent Bias of ML and PML Estimators")
 ggsave("manuscript/figs/sims-percent-bias.pdf", width = 8, height = 5)

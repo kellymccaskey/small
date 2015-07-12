@@ -1,6 +1,6 @@
 
 # function to perform simulations
-simulate <- function(n, k, b0, b1, n.sims = 1000) {
+simulate <- function(n, k, b0, b1) {
   # set progress bar
   # pb <- txtProgressBar(min = 0, max = n.sims, style = 3)
   # set covariates and probabilty
@@ -16,22 +16,19 @@ simulate <- function(n, k, b0, b1, n.sims = 1000) {
   mle.coef <- pmle.coef <- mle.int <- pmle.int <-
     prop.ones <- numeric(n.sims)
   for (i in 1:n.sims) {
-    # simulate outcome variable
-    y <- rbinom(n, 1, p)
-    mle.fit <- glm(y ~ X - 1, family = "binomial")
-    # just start over if data set has separation
-    if (sum(abs(coef(mle.fit)) > 7) == 0) {
-      # mle
-      # mle.fit <- glm(y ~ X - 1, family = "binomial") already done above!
-      mle.int[i] <- coef(mle.fit)[1]
-      mle.coef[i] <- coef(mle.fit)[2]
-      # pmle
-      pmle.fit <- logistf(y ~ X - 1, alpha = 0.1)
-      pmle.int[i] <- coef(pmle.fit)[1]
-      pmle.coef[i] <- coef(pmle.fit)[2]
-    }
-    #setTxtProgressBar(pb, i)
+  	# simulate outcome variable
+  	y <- rbinom(n, 1, p)
+  	# mle
+  	mle.fit <- glm(y ~ X - 1, family = "binomial")
+  	mle.int[i] <- coef(mle.fit)[1]
+  	mle.coef[i] <- coef(mle.fit)[2]
+  	# pmle
+  	pmle.fit <- logistf(y ~ X - 1, alpha = 0.1)
+  	pmle.int[i] <- coef(pmle.fit)[1]
+  	pmle.coef[i] <- coef(pmle.fit)[2]
+  	#setTxtProgressBar(pb, i)
   }
+  mle.coef <- mle.coef[abs(mle.coef) < 10]
   # mle vars
   res1 <- data.frame(n = n,
                      k = k,
@@ -99,7 +96,7 @@ for (m in 1:length(b0)) {  # loop over intercepts
     #cat(paste("---- k = ", k[j], "\n"))  # report number of variables
     for (i in 1:length(n)) {  # loop over sample sizes
       #cat(paste("------ n = ", n[i], "\n"))  # report sample sizes
-      sims0 <- simulate(n[i], k[j], b0[m], b1, n.sims = n.sims)  # simulate for given parameters
+      sims0 <- simulate(n[i], k[j], b0[m], b1)  # simulate for given parameters
       sims <- rbind(sims, sims0)  # combine with previous data
       #cat("\n")  # new line
       iter <- iter + 1
