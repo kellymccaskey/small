@@ -143,39 +143,46 @@ We illustrate the substantive importance of the penalized estimator with a repli
 
 \section*{Introduction}
 
-Asymptotically, the maximum likelihood (ML) estimator for the logistic regression coefficient vector $\hat{\beta}^{mle}$ is centered at the true value $\beta^{true}$, so that $E(\hat{\beta}^{mle}) \approx \beta^{true}$ when the sample is large.
-For small samples, though, the asymptotic approximation does not work well. The sampling distribution of $\hat{\beta}^{mle}$ is not centered at $\beta^{true}$, so that $E(\hat{\beta}^{mle}) \not\approx \beta^{true}$. 
+Asymptotically, the maximum likelihood (ML) estimator for the logistic regression coefficient vector $\hat{\beta}^{mle}$ is centered at the true value $\beta^{true}$, so that $E(\hat{\beta}^{mle}) \approx \beta^{true}$ when the sample is large (\citealt{Wooldridge2002}, pp. 391-395, \citealt{CasellaBerger2002}, p. 470).
+For small samples, though, the asymptotic approximation does not work well \citep[pp. 53-54]{Long1997}. 
+The sampling distribution of $\hat{\beta}^{mle}$ is not centered at $\beta^{true}$, so that $E(\hat{\beta}^{mle}) \not\approx \beta^{true}$. 
+Providing a rough heuristic about appropriate sample sizes, \cite{Long1997} writes: ``It is risky to use ML with samples smaller than 100, while samples larger than 500 seem adequate'' (p. 54).
 This presents the researcher with a problem: When dealing with small samples, how can she obtain reasonable estimates of logistic regression coefficients?
+Some problems do not lend themselves to gathering more data
 
-In the typical situation, the researcher models the probability of an event as $\text{Pr}(y_i) = \text{Pr}(y_i = 1~|~ X_i) = \dfrac{1}{1 + e^{-X_i\beta}}$, where $y$ is a vector of binary outcomes, $X$ is a matrix of explanatory variables and an intercept, and $\beta$ is a vector of model coefficients. 
-Using this model, it is straightforward to calculate the likelihood function 
+In the typical situation, the researcher models the probability of an event as $\text{Pr}(y_i) = \text{Pr}(y_i = 1~|~ X_i) = \dfrac{1}{1 + e^{-X_i\beta}}$, where $y$ represents a vector of binary outcomes, $X$ represents a matrix of explanatory variables and an intercept, and $\beta$ represents a vector of model coefficients. 
+Using this model, it is straightforward to derive the likelihood function 
 \begin{equation}\nonumber
 \text{Pr}(y | \beta) = L(\beta | y) = \displaystyle \prod_{i = 1}^n \left[\left( \dfrac{1}{1 + e^{-X_i\beta}}\right)^{y_i}\left( \dfrac{1}{1 + e^{-X_i\beta}}\right)^{1 - y_i}\right]\text{.}
 \end{equation}
-\noindent As usual, one can take the natural logarithm of both sides to calculate the log-likelihood function 
+\noindent As usual, one can take the natural logarithm of both sides to obtain the log-likelihood function 
 \begin{equation}\nonumber
 \log L(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right)\right].
 \end{equation}
-\noindent The researcher can obtain the maximum likelihood estimate $\hat{\beta}^{mle}$ by finding the vector $\beta \in \mathbb{R}^{k + 1}$ that maximizes $\log L$. 
-However, as noted above, this estimate is biased, so the $E(\hat{\beta}^{mle}) \neq \beta^{true}$.
+\noindent The researcher can obtain the maximum likelihood estimate $\hat{\beta}^{mle}$ by finding the vector $\beta$ that maximizes $\log L$. 
+However, this estimate is biased in small samples, so that $E(\hat{\beta}^{mle}) \neq \beta^{true}$.
 
 \section*{Correcting the Bias}
 
 The statistics literature offers a simple solution to the problem of bias. 
-\citet{Firth1993} suggests penalizing the usual likelihood function $L(\beta | y)$ by a factor equal to the square root of the determinant of the information matrix $I(\beta)|^\frac{1}{2}$, which yields a ``penalized'' likelihood function $L^*(\beta | y) = L(\beta | y)|I(\beta)|^\frac{1}{2}$.
-\footnote{It turns out that this penalty is equivalent to Jeffreys' (\citeyear{Jeffreys1946}) prior for the logistic regression model (\citealt{Firth1993}, \citealt{Poirier1994}).} 
+(\citealt{Firth1993}) suggests penalizing the usual likelihood function $L(\beta | y)$ by a factor equal to the square root of the determinant of the information matrix $I(\beta)|^\frac{1}{2}$, which yields a ``penalized'' likelihood function $L^*(\beta | y) = L(\beta | y)|I(\beta)|^\frac{1}{2}$ (see also \citealt{Kosmidis2014}, and \citealt{KosmidisFirth2009}). 
+It turns out that this penalty is equivalent to Jeffreys' (\citeyear{Jeffreys1946}) prior for the logistic regression model (\citealt{Firth1993}, \citealt{Poirier1994}).
 Taking logs yields the penalized log-likelihood function.
 \begin{equation}\nonumber
-\log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + 0.5 \log |I(\beta)|.
+\log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + \dfrac{1}{2} \log |I(\beta)|.
 \end{equation}
-Then the researcher can obtain the \emph{penalized} maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta \in \mathbb{R}^{k + 1}$ that maximizes $\log L^*$. 
-\citet{Firth1993} shows that $\hat{\beta}^{pmle}$ is much less biased than $\hat{\beta}^{mle}$. 
-The penalized maximum likelihood estimate is easy to calculate in R using the \texttt{logistf} or \texttt{brglm()} packages. 
-See the Online Appendix Section \ref{sec:pmle-in-R} for an example.
+Then the researcher can obtain the \emph{penalized} maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$. 
+\cite{Zorn2005} previously introduced political scientists to Firth's penalty in the context of solving the problem of separation, but the broader application to small sample problem seems to have gone unnoticed in political science.
+
+A researcher can implement PML just as easily as she can implement ML, but PML estimates are both less biased \citep{Firth1993} and more efficient than ML estimates \citep[p. 49]{Kosmidis2007}.\footnote{Further, the penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages. 
+See the Section \ref{sec:pmle-in-R} of the Appendix for an example.}
+This is important to note. When choosing between estimators, researchers often face a tradeoff between bias and efficiency \citep[pp. 37-38]{HastieTibshiraniFriedman2013}.
+But there is no bias-variance tradeoff between ML and PML estimators.
+The PML estimator exhibits both lower bias \textit{and} lower variance.\footnote{We should also note that the PML estimates also solve the problem with separation (\citealt{Zorn2005} and \citealt{Rainey-separation}).}
 
 \section*{Monte Carlo Simulations}
 
-To demonstrate the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$, we conduct a Monte Carlo simulation comparing the sampling distribution of the ML and PML estimates.
+To demonstrate the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$ in sample sizes sometimes found in political science research, we conduct a Monte Carlo simulation comparing the sampling distributions of the ML and PML estimates.
 These simulations demonstrate three features of the ML and PML estimators:
 \begin{enumerate}
 \item The ML estimator can be quite biased in small samples, as much as 50\%, though the bias quickly disappears as the sample size nears and passes 150. The PML is nearly unbiased, regardless of sample size.
@@ -185,50 +192,76 @@ These simulations demonstrate three features of the ML and PML estimators:
 In our simulation, the true data generating process is always $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X_i \beta = \beta_{cons} + 0.5 x_1 + \sum_{j = 2}^k 0.2 x_j$. 
 We consider $\beta_1$ as the coefficient of interest.
 Each fixed $x_j$ is drawn from a normal distribution with mean of zero and standard deviation of one. 
-The simulation varies the sample size $n$ from 40 to 150, the number of explanatory variables $k \in \{2, 4, 6\}$, and the the intercept $\beta_{cons} \in \{-1, -0.5, 0.0\}$ (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%). 
-We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficient using ML and PML for each data set.
-We calculate the expected value and variance of the estimates by computing the mean and variance of the ML and PML estimates across the 10,000 data sets.
+The simulation varies the sample size $n$ from 30 to 210, the number of explanatory variables $k \in \{3, 6, 9\}$, and the the intercept $\beta_{cons} \in \{-1, -0.5, 0.0\}$ (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%). 
+We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficients using ML and PML for each data set.
+We calculate the expected value and variance of the estimates by computing the mean and variance of the ML and PML estimates across the 10,000 data sets. 
 
 \subsection*{Bias}
 
-We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the sample size, proportion of events, and number of explanatory variables vary.  Figure \ref{fig:sims-coef-perc-bias} shows the results. The sample size varies across the x-axes of each plot and each panel shows a distinct combination of intercept and number of variables in the model. Across the range of the parameters of our sample, the bias of the MLE varies from about 40\% (intercept equal to -1, 6predictors, 40 observations) to around 3\% (50\% events, 2 predictors, 150 observations). The bias in the PMLE, on the other hand, is barely noticeable, regardless of the simulation parameters. For the worst-case scenario with six variables, 40 observations, and an intercept of -1 (about 11 events), the percent bias in the PMLE is less than one percent--better than the best-case scenario for the MLE.
+We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the sample size, proportion of events, and number of explanatory variables vary.  
+Figure \ref{fig:sims-coef-perc-bias} shows the results. 
+The sample size varies across the x-axis of each plot and each panel shows a distinct combination of intercept and number of variables in the model. 
+Across the range of the parameters of our sample, the bias of the MLE varies from about 120\% (intercept equal to -1, 9 predictors, 30 observations) to around 2\% (intercept equal to zero, 2 predictors, 150 observations). 
+The bias in the PMLE, on the other hand, is barely noticeable, regardless of the simulation parameters. 
+For the worst-case scenario with nine variables, 30 observations, and an intercept of -1 (about 11 events), the percent bias in the PMLE is only about seven percent. 
+Figures \ref{fig:ev} and \ref{fig:bias} in Section \ref{sec:app-sims} of the Appendix show the expected value and (absolute) bias of these estimates.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/sims-percent-bias.pdf}
-\caption{This figure illustrates the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$. Notice that when $N = 40$, the bias of $\hat{\beta}^{mle}$ away from zero is about 40\% or more if events are relatively uncommon (e.g., $\beta_0 = -1$, which leads to about 28\% events) or the researcher uses several explanatory variables (e.g., 6 or more). However, notice that $\hat{\beta}^{pmle}$ is essentially unbiased regardless of the sample size, frequency of events, or number of explanatory variables.}\label{fig:sims-coef-perc-bias}
+\caption{This figure illustrates the substantial bias of $\hat{\beta}^{mle}$ and the near unbiasedness of $\hat{\beta}^{pmle}$.}\label{fig:sims-coef-perc-bias}
 \end{center}
 \end{figure}
 
 \subsection*{Variance}
 
+In many cases, estimation routines trade-off bias and variance, that is \textit{not} the case for ML and PML. 
+Figure \ref{fig:sims-var} shows that, in addition to nearly eliminating the bias, PML also substantially reduces the variance of the estimator, especially for small sample sizes (lss than about 75 observations in our simulations). 
+For $N = 30$ and $\beta_{cons} = -1$ (about 28\% events), the variance of the ML estimator is about 95\%, 243\%, and 610\% larger than the PML estimator for 3, 6, and 9 variables, respectively. 
+For $N = 60$, the variance is about 30\%, 58\% and 91\% larger, respectively. For a larger sample of $N = 210$, the variance is still about 7\%, 10\%, and 14\% larger for the ML estimator. 
+The smaller variance is perhaps more important than the reduced bias.
+Rather than focus on how close the averages of the estimates are to the true value (e.g., bias), a more importance summary of estimator performance might be how far the estimates are from the true value, on average (e.g., mean squared error).
+The mean squared error $\text{MSE} = \frac{1}{n}\sum_{i=1}^n(\hat{\beta} - \beta^{true})^2 = \text{variance} + \text{bias}^2$.
+The large differences in the variance and the relatively smaller differences in bias lead to substantial differences in the MSE of the two estimators.
+Figures \ref{fig:var-infl}, \ref{fig:mse}, and \ref{fig:mse-infl} in Section \ref{sec:app-sims} of the Appendix show the variance inflation, mean squared error, and mean squared error inflation of the estimates.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-var.pdf}
+\caption{This figure illustrates the smaller variance of $\hat{\beta}^{pmle}$ compared to $\hat{\beta}^{mle}$.}\label{fig:sims-var}
+\end{center}
+\end{figure}
+
+These simulation results illustrate that Firth's (1993) bias correction is not trivial. 
+In small samples, logistic regression coefficients estimated with ML are severely biased.
+The penalty identified by Firth nearly eliminates this bias, and, as a side effect, produces large gains in the efficiency of the estimates. 
+
 \section*{Replication of Weisiger (2014)}
 
-To illustrate the potential importance of using the nearly unbiased PML estimator, we replicate a portion of the statistical analysis in \cite{Weisiger2014}. 
-Weisiger explains that conquerors in conventional wars cannot expect to win over the defeated population and he describes how sometimes violence continues after the official end of the war in the form of guerrilla warfare instead. 
-Weisiger argues that resistance is more likely when conditions are favorable for insurgency, such as difficult terrain, the size and concentration of the occupying force, or if there remains a pre-war leader for potential insurgents to rally around. 
-We focus on his hypothesis that there will be a greater chance of resistance when the pre-conflict political leader ``remains at large in the conquered country" (p. 8).
+To illustrate the potential importance of using the nearly unbiased PML estimator in an application, we replicate a portion of the statistical analysis in \cite{Weisiger2014}. 
+Weisiger describes how, after the official end of the war, violence sometimes continues in the form of guerrilla warfare. 
+He argues that resistance is more likely when conditions are favorable for insurgency, such as difficult terrain, a occupying force, or a pre-war leader remains at-large in the country. 
 
-Weisiger's sample consists of 35 observations (with 14 insurgencies). In the orginal analysis, Weisiger uses a linear probability model. He writes:
+%\subsection*{Coefficient Estimates}
 
-\begin{quote}
-For multivariate analysis I make use of a linear probability model, which avoids problems with separation but introduces the possibility of non-meaningful predicted probabilities outside the [0,1] range (p. 11).
-\end{quote}
-
-As Weisiger notes, predictions outside the $[0, 1]$ interval pose a problem for interpreting the linear probability model.\footnote{We should also note that the PML estimates also solve the problem with separation. See \cite{Zorn2005} and \cite{Rainey-separation}.} 
-For example, in one case the linear probability model estimates a probability of 1.41 of insurgency. 
+Weisiger's sample consists of 35 observations (with 14 insurgencies). 
+We re-analyze Weisiger's data using logistic regression to show the substantial difference between the biased ML estimates and the nearly unbiased PML estimates. Weisiger uses a linear probability model for this analysis, but that leads to the probabilities that fall outside the $[0, 1]$ interval.\footnote{Specifically, we re-analyze the Model 3 in Weisiger's Table 2 (p. 14). 
+In the original analysis, Weisiger uses a linear probability model. 
+He writes that ``I [Weisiger] make use of a linear probability model, which avoids problems with separation but introduces the possibility of non-meaningful predicted probabilities outside the [0,1] range'' (p. 11).
+As he notes, predictions outside the $[0, 1]$ interval pose a problem for interpreting the linear probability model. 
+In these data for example, the linear probability model estimates a probability of 1.41 of insurgency in one case. 
 In another, it estimates a probability of -0.22. 
+Overall, 25\% of the estimated probabilities based on the linear probability model are larger than one or less than zero.
 Of course, these results are nonsense. 
 However, because of the well-known small-sample bias, methodologists discourage researchers from using logistic regression with small samples.
 The PML approach, though, solves the problem of bias as well as nonsense predictions.
-
-\subsection*{Coefficient Estimates}
-
-We re-analyze Weisiger's data using logistic regression to show the substantial difference between the biased ML estimates and the unbiased PML estimates. 
+We should also note that the PML estimates also solve the problem with separation (\citealt{Zorn2005} and \citealt{Rainey-separation}).} 
 Figure \ref{fig:weisiger-coefs} shows the coefficient estimates and 90\% confidence intervals using ML and PML. 
 Notice that the unbiased PML estimates are substantially smaller in many cases.
+Although the coefficient for terrain only changes by 16\%, each of the remaining coefficients changes by more than 45\%! 
+The coefficient for per capita GDP shrinks by more the 60\% and the coefficient for occupying force density grows by nearly 100\%.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/weisiger-coefs.pdf}
 \caption{This figure shows the coefficients for a logistic regression model estimated explaining post-conflict guerrilla war estimated with ML and PML. 
@@ -236,65 +269,64 @@ Notice that the PML estimates tend to be much smaller than the ML estimates.}\la
 \end{center}
 \end{figure}
 
-Figure \ref{fig:weisiger-perc-change} shows the percentage change from the ML estimator to the PML estimator. 
-Although the coefficient for terrain only changes by 16\%, each of the remaining coefficients changes by more than 45\%! The coefficient for per capita GDP shrinks by more the 60\% and the coefficient for occupying force density grows by nearly 100\%.
+%Figure \ref{fig:weisiger-perc-change} shows the percentage change from the ML estimator to the PML estimator. 
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.7]{figs/weisiger-perc-change.pdf}
-\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. 
-Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. 
-All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
-\end{center}
-\end{figure}
+%\begin{figure}[H]
+%\begin{center}
+%\includegraphics[scale = 0.7]{figs/weisiger-perc-change.pdf}
+%\caption{This figure shows the percentage change in the logistic regression coefficients in the model of post-conflict guerrilla war from ML to PML. 
+%Notice that these changes are substantial--the coefficient for per capita GDP shrinks by over 60\% and the coefficient for occupying force density grows by nearly 100\%. 
+%All the coefficients change by more than 45\%, with the exception of terrain, which decreases by 16\%.}\label{fig:weisiger-perc-change}
+%\end{center}
+%\end{figure}
 
-\subsection*{Out-of-Sample Fit}
+%\subsection*{Out-of-Sample Fit}
 
-Because we do not know the true model, we cannot know which of these sets of coefficient is best. However, we can use out-of-sample prediction to help adjudicate between these two methods. We use leave-one-out cross-validation and summarize the prediction errors using Brier and log scores. The procedure works as follows:
+Because we do not know the true model, we cannot know which of these sets of coefficient is best. 
+However, we can use out-of-sample prediction to help adjudicate between these two methods. 
+We use leave-one-out cross-validation and summarize the prediction errors using Brier and log scores, for which larger values indicate worse predictive ability.\footnote{The Brier score is calculated as $\sum_{i = 1}^n (y_i - p_i)^2$, where $i$ indexes the observations, $y_i \in \{0, 1\}$ represents the actual outcome, and $p_i \in (0, 1)$ represents the estimated probability that $y_i = 1$. 
+The log score as $-\sum_{i = 1}^n log(r_i)$, where $r_i = y_i p_i + (1 - y_i)(1 - p_i)$. 
+Notice that because we are logging $r_i \in [0, 1]$, $\sum_{i = 1}^n log(r_i)$ is always negative and smaller (i.e., more negative) values indicate worse fit. 
+We choose to take the negative of $\sum_{i = 1}^n log(r_i)$, so that, like the Brier score, larger values indicate a worse fit.} 
+The ML estimates produce a Brier score of 0.14, and the PML estimates lower the Brier score by 14\% to 0.12. 
+The ML estimates produce a log score of 0.58, while the PML estimates lower the log score by 34\% to 0.38. 
+The PML estimates outperform the ML estimates for both approaches to scoring.
+This provides good evidence that the PML estimates better capture the data generating process.
+ 
+%\noindent Figure \ref{fig:weisiger-out-sample-fit} shows the Brier and log scores for the two sets of estimates. 
 
-\begin{enumerate}
-\item Choose an observation $i$ to predict.
-	\begin{enumerate}
-	\item Create a training data set ($N = 34$) by dropping observation $i$ from the full data set ($N = 35$).
-	\item Estimate the the logistic regression model using both ML and PML using the training data.
-	\item Estimate the probability of an event (i.e., insurgency) for observation $i$. Store this estimate as $p_i$.
-	\end{enumerate}
-\item Repeat Step 1 for each observation in the full data set to obtain a full vector of out-of-sample predictions $p$.
-\item Calculate the Frier score $B$ as $B = \sum_{i = 1}^n (y_i - p_i)^2$, where $i$ indexes the observations, $y_i \in \{0, 1\}$ represents the actual outcome, and $p_i \in (0, 1)$ represents the estimated probability that $y_i = 1$. This corresponds to the mean squared errors, so larger values indicate a worse fit.
-\item Calculate the log score as $-\sum_{i = 1}^n log(r_i)$, where $r_i = y_i p_i + (1 - y_i)(1 - p_i)$. Notice that because we are logging $r_i \in [0, 1]$, $\sum_{i = 1}^n log(r_i)$ is always negative and smaller (i.e., more negative) values indicate worse fit. We choose to take the negative of $\sum_{i = 1}^n log(r_i)$, so that, like the Brier score, larger values indicate a worse fit.
-\end{enumerate}
+%\begin{figure}[H]
+%\begin{center}
+%\includegraphics[scale = 0.7]{figs/weisiger-out-sample-fit.pdf}
+%\caption{This figure shows the out-of-sample predictive ability (leave-on-out cross-validation) of the ML and PML estimators using both Brier and log scores to measure performance. Higher scores indicate better performance. Notice that the PML estimator out-performs the ML estimator according to both scores. This suggests that the ML estimator is overfitting the data.}\label{fig:weisiger-out-sample-fit}
+%\end{center}
+%\end{figure}
 
-\noindent Figure \ref{fig:weisiger-out-sample-fit} shows the Brier and log scores for the two sets of estimates. PML estimates outperform the ML estimates with both approach to scoring.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.7]{figs/weisiger-out-sample-fit.pdf}
-\caption{This figure shows the out-of-sample predictive ability (leave-on-out cross-validation) of the ML and PML estimators using both Brier and log scores to measure performance. Higher scores indicate better performance. Notice that the PML estimator out-performs the ML estimator according to both scores. This suggests that the ML estimator is overfitting the data.}\label{fig:weisiger-out-sample-fit}
-\end{center}
-\end{figure}
-
-\subsection*{Quantities of Interest}
-
-Because we are using a logistic regression, we might be more interested in \textit{functions} of the coefficients rather than the coefficients themselves. 
-Setting all other explanatory variables at their sample medians, we calculated the predicted probabilities, the first difference, and the risk ratio for the probability of a post-conflict guerrilla war as countries gain a coordinating leader. 
-Figure \ref{fig:weisiger-qis} shows the estimates of the quantities of interest.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/weisiger-qis.pdf}
-\caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war. Notice that the PML estimates suggests 19\% smaller first difference and a 24\% smaller risk ratio.}\label{fig:weisiger-qis}
-\end{center}
-\end{figure}
+Because we are using a logistic regression, we might be more interested in \textit{functions} of the coefficients than the coefficients themselves. 
+In this example, we focus on Weisiger's hypothesis that there will be a greater chance of resistance when the pre-conflict political leader remains at large in the conquered country.
+Setting all other explanatory variables at their sample medians, we calculated the predicted probabilities, the first difference, and the risk ratio for the probability of a post-conflict guerrilla war as countries gain a coordinating leader.
+ 
+%Figure \ref{fig:weisiger-qis} shows the estimates of the quantities of interest.
+%
+%\begin{figure}[H]
+%\begin{center}
+%\includegraphics[width = \textwidth]{figs/weisiger-qis.pdf}
+%\caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war. Notice that the PML estimates suggests 19\% smaller first difference and a 24\% smaller risk ratio.}\label{fig:weisiger-qis}
+%\end{center}
+%\end{figure}
 
 PML pools the estimated probabilities toward zero. 
 When a country lacks a coordinating leader, ML suggests a 23\% chance of rebellion while PML suggests a 28\% chance. 
 On the other hand, when country \textit{does have} a coordinating leader, ML suggests a 99\% chance of rebellion of 0.99, but PML lowers this to 89\%. 
 Accordingly, PML suggests smaller effect sizes, whether using a first difference or risk ratio. 
-PML shrinks the estimated first difference by 19\% from 0.75 to 0.61. 
-It shrinks the risk ration by 24\% from 4.2 to 3.2.  
+PML shrinks the estimated first difference by 19\% from 0.75 to 0.61 and the risk ratio by 24\% from 4.2 to 3.2.
 
-By re-analyzing data from \cite{Weisiger2014}, we demonstrate an improved method of estimating logistic regression coefficients, especially with small samples. 
-In small samples, maximum likelihood is substantially biased upward, but \textit{penalized} maximum likelihood is nearly unbiased. These reductions in bias do not come at a large cost. Though perhaps more subtle and theoretically difficult that maximum likelihood, penalized maximum likelihood is just as easy to use in practice.
+This substantial difference in these estiamtes demonstrates the potential importance of using PML whne dealing with small samples and binary outcomes.
+In small samples, ML leads to large biases in logistic regression coefficients. 
+Further, these estimates are biased \textit{away} from zero, leading researchers to conclude that variables have larger effects than they actually do. 
+However, PML is nearly unbiased, regardless of sample size. 
+And these reductions in bias do not come at a large cost. 
+Indeed, the PML estimates exhibit less bias, smaller variance, and lower mean squared error than the ML estimates.
 
 \singlespace 
 \newpage
@@ -310,53 +342,6 @@ In small samples, maximum likelihood is substantially biased upward, but \textit
 \vspace{3mm}
 {\large Logistic Regression in Small Samples}\\\vspace{2mm}
 \end{center}
-
-\section{Additional Simulation Results}\label{sec:app-sims}
-
-\subsection{Expected Value}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/sims-ev.pdf}
-\caption{This figure shows the expected value of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$. The true value is $\beta = 0.5$.}\label{fig:ev}
-\end{center}
-\end{figure}
-
-\subsection{Bias}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/sims-bias.pdf}
-\caption{This figure shows the bias of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:bias}
-\end{center}
-\end{figure}
-
-\subsection{Mean Squared Error}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
-\caption{This figure shows the mean squared error of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:mse}
-\end{center}
-\end{figure}
-
-\subsection{Variance Inflation}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
-\caption{This figure shows the percent inflation in the variance of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:var-infl}
-\end{center}
-\end{figure}
-
-\subsection{Mean Squared Error Inflation}
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/sims-mse-infl.pdf}
-\caption{This figure shows the percent increase in the mean square error of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:mse}
-\end{center}
-\end{figure}
 
 \section{Penalized Maximum Likelihood Estimation of Logistic Regression Models in R}\label{sec:pmle-in-R}
 
@@ -413,6 +398,53 @@ help(brglm)
 \end{verbatim}
 
 
+
+\section{Additional Simulation Results}\label{sec:app-sims}
+
+\subsection{Expected Value}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-ev.pdf}
+\caption{This figure shows the expected value of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$. The true value is $\beta = 0.5$.}\label{fig:ev}
+\end{center}
+\end{figure}
+
+\subsection{Bias}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-bias.pdf}
+\caption{This figure shows the bias of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:bias}
+\end{center}
+\end{figure}
+
+\subsection{Variance Inflation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
+\caption{This figure shows the percent inflation in the variance of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:var-infl}
+\end{center}
+\end{figure}
+
+\subsection{Mean Squared Error}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-var-infl.pdf}
+\caption{This figure shows the mean squared error of $\hat{\beta}^{mle}$ and $\hat{\beta}^{pmle}$.}\label{fig:mse}
+\end{center}
+\end{figure}
+
+\subsection{Mean Squared Error Inflation}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/sims-mse-infl.pdf}
+\caption{This figure shows the percent increase in the mean square error of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:mse-infl}
+\end{center}
+\end{figure}
 
 \end{appendix}
 
