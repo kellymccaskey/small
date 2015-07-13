@@ -83,12 +83,13 @@ gg <- ggplot(models_df, aes(var_name_print, est,
 														ymax = upr_90,
 														color = model_name,
 														linetype = model_name)) + 
-	geom_pointrange(width = 0, position = position_dodge(width = 0.4)) +
+	geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
 	coord_flip() + 
 	labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
 	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 
 	labs(x = NULL) +
 	labs(color = "Method", linetype = "Method") + 
+	scale_color_manual(values = c("#998ec3", "#f1a340")) +
 	annotate("text", .7, 10, label = "N = 35 (14 events)", 
 					 color = ann_color, size = ann_size) + 
 	theme
@@ -256,8 +257,8 @@ print(as.data.frame(prob_df))
 # plot
 prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
 prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
-  geom_point() + 
-  geom_line(aes(x = as.numeric(coord))) + 
+  geom_point(size = 2.2) + 
+  geom_line(aes(x = as.numeric(coord)), size = 0.7) + 
   scale_y_continuous(limits = c(0, 1)) +
   labs(title = "Probability of a Post-Conflict Guerrilla War") +
   labs(x = "Coorinating Leader") + 
@@ -268,7 +269,8 @@ prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
            vjust = c(0.5, 1.0, 0.5, 0.0), 
            size = ann_size,
            color = ann_color) + 
-  theme
+	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	theme
 
 # first difference
 method = c("ML", "PML")
@@ -288,9 +290,9 @@ print(as.data.frame(fd_df))
 # plot
 fd_gg <- ggplot(fd_df, aes(method, est, color = method,
                            ymin = lwr_90, ymax = upr_90)) +
-  geom_pointrange() +
+  geom_pointrange(size = 0.7) +
   geom_text(aes(label = round(est, 2)), 
-            vjust = -0.5, size = ann_size, color = ann_color) +
+            vjust = -0.7, size = ann_size, color = ann_color) +
   coord_flip() + 
   labs(title = "First Difference") +
   labs(x = "Method") + 
@@ -298,7 +300,8 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method,
   annotate("text", y = 0.7, x = 0.7, label = caption, 
            size = ann_size,
            color = ann_color) + 
-  theme + theme(legend.position = "none") 
+	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	theme + theme(legend.position = "none") 
 
 # risk ratio
 method = c("ML", "PML")
@@ -318,9 +321,9 @@ print(as.data.frame(rr_df))
 # plot
 rr_gg <- ggplot(rr_df, aes(method, est, color = method,
                            ymin = lwr_90, ymax = upr_90)) +
-  geom_pointrange() +
+  geom_pointrange(size = 0.7) +
   geom_text(aes(label = round(est, 1)), 
-            vjust = -0.5, size = ann_size, color = ann_color) +
+            vjust = -0.7, size = ann_size, color = ann_color) +
   coord_flip() + 
   labs(title = "Risk Ratio") +
   labs(x = "Method") + 
@@ -328,7 +331,8 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method,
   annotate("text", y = 10.7, x = 0.7, label = caption,
            size = ann_size,
            color = ann_color) + 
-  theme + theme(legend.position = "none") 
+	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	theme + theme(legend.position = "none") 
 
 # combine plots
 pdf("manuscript/figs/weisiger-qis.pdf", width = 8, height = 6)
