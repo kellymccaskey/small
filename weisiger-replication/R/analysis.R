@@ -9,7 +9,7 @@ ann_color <- "grey50"
 
 # load data
 cat("\nreading data...\n\n")
-weisiger <- read_csv("weisiger-replication/data/weisiger.csv")
+weisiger <- read.csv("weisiger-replication/data/weisiger.csv")
 
 # estimate models
 cat("\nestimating models...\n\n")
@@ -85,7 +85,7 @@ gg <- ggplot(models_df, aes(var_name_print, est,
 														linetype = model_name)) + 
 	geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
 	coord_flip() + 
-	labs(title = "Logistic Regressin Model Explaining\nPost-Conflict Guerrilla War") + 
+	labs(title = "Logistic Regression Model Explaining\nPost-Conflict Guerrilla War") + 
 	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 
 	labs(x = NULL) +
 	labs(color = "Method", linetype = "Method") + 
@@ -261,7 +261,7 @@ prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
   geom_line(aes(x = as.numeric(coord)), size = 0.7) + 
   scale_y_continuous(limits = c(0, 1)) +
   labs(title = "Probability of a Post-Conflict Guerrilla War") +
-  labs(x = "Coorinating Leader") + 
+  labs(x = "Coordinating Leader") + 
   labs(y = "Probability") +
   labs(color = "Method") +
   annotate("text", x = c(2, 1, 2, 1), y = prob, label = round(prob, 2), 
