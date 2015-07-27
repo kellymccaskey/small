@@ -3,22 +3,23 @@
 ann_size <- 3
 ann_color <- "grey50"
 
-# --------------- #
-# estimate models #
-# --------------- #
-
 # load data
-cat("\nreading data...\n\n")
-weisiger <- read.csv("weisiger-replication/data/weisiger.csv")
+ge <- read_csv("ge-replication/data/ge.csv")
+
+# drop missing
+keep <- c("court", "dq", "cr", "pc", "ag", "sp", "pe", "cc", "ap", "dc", "st", "sg")
+ge <- na.omit(ge[, keep])
+
+# formula
+f <- court ~ dq + cr + pc + ag + sp + pe + cc + ap + dc + st + sg
 
 # estimate models
-cat("\nestimating models...\n\n")
-f <- resist ~ polity_conq + lndist + terrain + soldperterr + gdppc2 + coord
-ls <- lm(f, data = weisiger)  # linear probability model
-mle <- glm(f, data = weisiger, family = "binomial")
-pmle <- brglm(f, data = weisiger, family = "binomial")
+ls <- lm(f, data = ge)  # linear probability model
+mle <- glm(f, data = ge, family = "binomial")
+pmle <- brglm(f, data = ge, family = "binomial")
 cat(screenreg(list(mle, pmle), stars = 0.1, 
               custom.model.names = c("MLE", "PMLE")))
+
 
 # count ls predictions outside [0, 1]
 
@@ -49,12 +50,12 @@ tidy_models <- function(model_list, model_names) {
     est <- coef(model)
     se <- sqrt(diag(vcov(model)))
     df0 <- data.frame(var_name = names(coef(model)),
-                     est = est,
-                     se = se,
-                     lwr_se = est - se,
-                     upr_se = est + se,
-                     lwr_90 = est - 1.64*se,
-                     upr_90 = est + 1.64*se) 
+                      est = est,
+                      se = se,
+                      lwr_se = est - se,
+                      upr_se = est + se,
+                      lwr_90 = est - 1.64*se,
+                      upr_90 = est + 1.64*se) 
     df0$model_name <- model_names[i]
     df <- rbind(df, df0)
   }
@@ -67,34 +68,40 @@ models_df <- tidy_models(list(mle, pmle), c("ML Estimate", "PML Estimate"))
 
 # add variable names for printing
 vnp <- c("Intercept",
-                    "Conqueror's Polity Score",
-                    "log(Intercapital Distance)",
-                    "Terrain",
-                    "Occupying Force Density",
-                    "Per Capita GDP",
-                    "Coordinating Leader")
+         "Death-Qualified",
+         "Crime",
+         "Particularizing Circumstances",
+         "Aggravating Factors",
+         "State Psychiatric Examination",
+         "Political Environment",
+         "Court Change",
+         "Appellant",
+         "Defendant Counsel",
+         "State",
+         "Solicitor General")
 models_df <- mutate(models_df, var_name_print = rep(vnp, 2))
 models_df <- mutate(models_df, var_name_print = factor(var_name_print, 
                                                        levels = vnp))
 
 # plot coefficients
-gg <- ggplot(models_df, aes(var_name_print, est, 
-														ymin = lwr_90,
-														ymax = upr_90,
-														color = model_name,
-														linetype = model_name)) + 
-	geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
-	coord_flip() + 
-	labs(title = "Logistic Regression Model Explaining\nPost-Conflict Guerrilla War") + 
-	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 
-	labs(x = NULL) +
-	labs(color = "Method", linetype = "Method") + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	annotate("text", .7, 10, label = "N = 35 (14 events)", 
-					 color = ann_color, size = ann_size) + 
-	theme
-ggsave("manuscript/figs/weisiger-coefs.pdf", gg,
-			 height = 4, width = 9)
+gg <- ggplot(subset(models_df, var_name_print != "Intercept"), 
+                    aes(var_name_print, est, 
+                            ymin = lwr_90,
+                            ymax = upr_90,
+                            color = model_name,
+                            linetype = model_name)) + 
+  geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
+  coord_flip() + 
+  labs(title = "Logistic Regression Model Explaining\nConservative Court Decisions") + 
+  labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Intercept Not Shown)") + 
+  labs(x = NULL) +
+  labs(color = "Method", linetype = "Method") + 
+  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  annotate("text", .7, 10, label = "N = 35 (14 events)", 
+           color = ann_color, size = ann_size) + 
+  theme
+ggsave("manuscript/figs/ge-coefs.pdf", gg,
+       height = 5, width = 9)
 
 # plot change in coefficients
 percent_change <- 100*(coef(pmle)/coef(mle) - 1)
@@ -109,7 +116,7 @@ gg <- ggplot(change_df, aes(x = var_name_print, y = percent_change)) +
   labs(y = "Percent Change from ML Estimates to PML Estimates") + 
   labs(x = NULL) + 
   theme
-ggsave("manuscript/figs/weisiger-perc-change.pdf", gg,
+ggsave("manuscript/figs/ge-perc-change.pdf", gg,
        height = 3, width = 6)
 
 # ------------------------------------- #
@@ -120,7 +127,7 @@ ggsave("manuscript/figs/weisiger-perc-change.pdf", gg,
 cat("\ncalculating and plotting model fit...\n\n")
 
 # in-sample fit
-y <- with(weisiger, resist)
+y <- with(ge, court)
 p_mle <- predict(mle, type = "response")
 p_pmle <- predict(pmle, type = "response")
 brier_mle <- brierscore(y ~ p_mle); mean(brier_mle)
@@ -149,16 +156,16 @@ gg <- ggplot(isf_df, aes(x = score_type, y = score, fill = method)) +
   labs(x = "Score Type") +
   labs(fill = "Method") + 
   theme
-ggsave("manuscript/figs/weisiger-in-sample-fit.pdf", gg,
+ggsave("manuscript/figs/ge-in-sample-fit.pdf", gg,
        height = 3, width = 5)
 
 # out-sample fit
-n_predict <- nrow(weisiger)
+n_predict <- nrow(ge)
 p_mle <- p_pmle <- numeric(n_predict)
 for (i in 1:n_predict) {
   # partition training and test sets
-  d_train <- weisiger[-i, ]
-  d_test <- weisiger[i, ]
+  d_train <- ge[-i, ]
+  d_test <- ge[i, ]
   # fit models to training data
   mle0 <- glm(f, d_train, family = "binomial")
   pmle0 <- brglm(f, d_train, family = "binomial")
@@ -167,7 +174,7 @@ for (i in 1:n_predict) {
   p_pmle[i] <- predict(pmle0, newdata = d_test, type = "response")
 }
 
-y <- with(weisiger, resist)
+y <- with(ge, court)
 brier_mle <- brierscore(y ~ p_mle); mean(brier_mle)
 brier_pmle <- brierscore(y ~ p_pmle); mean(brier_pmle)
 log_mle <- logscore(y ~ p_mle); mean(log_mle)
@@ -194,7 +201,7 @@ gg <- ggplot(osf_df, aes(x = score_type, y = score, fill = method)) +
   labs(x = "Score Type") +
   labs(fill = "Method") + 
   theme
-ggsave("manuscript/figs/weisiger-out-sample-fit.pdf", gg,
+ggsave("manuscript/figs/ge-out-sample-fit.pdf", gg,
        height = 3, width = 5)
 
 # --------------------------------- #
@@ -208,8 +215,8 @@ cat("\ncalculating and plotting quantities of interest...\n\n")
 
 # a function to do most of the work
 qi <- function(model, sims, var_name, var_quantiles = c(0, 1)) {
-  var_values <- quantile(data.frame(weisiger)[, var_name], var_quantiles)
-  X <- set_rest_at_median(f, weisiger, var_name = var_name, 
+  var_values <- quantile(data.frame(ge)[, var_name], var_quantiles)
+  X <- set_rest_at_median(f, ge, var_name = var_name, 
                           var_values = var_values)
   X <- list_to_matrix(X, f)
   # estimates
@@ -234,33 +241,33 @@ sims_mle <- mvrnorm(10000, coef(mle), vcov(mle))
 sims_pmle <- mvrnorm(10000, coef(pmle), vcov(pmle))
 
 # calculate qis
-qi_mle <- qi(mle, sims_mle, "coord")
+qi_mle <- qi(mle, sims_mle, "sg")
 qi_mle_est <- with(qi_mle, est_df)
 qi_mle_sims <- with(qi_mle, sims_df)
-qi_pmle <- qi(pmle, sims_pmle, "coord")
+qi_pmle <- qi(pmle, sims_pmle, "sg")
 qi_pmle_est <- with(qi_pmle, est_df)
 qi_pmle_sims <- with(qi_pmle, sims_df)
 
 method <- c("ML", "ML", "PML", "PML")
-coord <- c("Coordinating Leader", 
-           "No Coordinating Leader",
-           "Coordinating Leader", 
-           "No Coordinating Leader")
+sg <- c("Solicitor General Files Amicus Brief", 
+           "Solicitor General Does Not File Amicus Brief",
+           "Solicitor General Files Amicus Brief", 
+           "Solicitor General Does Not File Amicus Brief")
 prob <- c(with(qi_mle_est, p_hi_est),
           with(qi_mle_est, p_lo_est),
           with(qi_pmle_est, p_hi_est),
           with(qi_pmle_est, p_lo_est))
-prob_df <- data_frame(method, coord, prob)
+prob_df <- data_frame(method, sg, prob)
 cat("\npredicted probabilities\n")
 print(as.data.frame(prob_df))
 
 # plot
-prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
-prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
+prob_df <- mutate(prob_df, sg = reorder(factor(sg), prob))
+prob_gg <- ggplot(prob_df, aes(x = sg, y = prob, color = method)) +
   geom_point(size = 2.2) + 
-  geom_line(aes(x = as.numeric(coord)), size = 0.7) + 
+  geom_line(aes(x = as.numeric(sg)), size = 0.7) + 
   scale_y_continuous(limits = c(0, 1)) +
-  labs(title = "Probability of a Post-Conflict Guerrilla War") +
+  labs(title = "Probability of a Conservative Decision") +
   labs(x = "") + 
   labs(y = "Probability") +
   labs(color = "Method") +
@@ -269,8 +276,8 @@ prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
            vjust = c(0.5, 1.0, 0.5, 0.0), 
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	theme
+  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  theme
 
 # first difference
 method = c("ML", "PML")
@@ -300,8 +307,8 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method,
   annotate("text", y = 0.7, x = 0.7, label = caption, 
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	theme + theme(legend.position = "none") 
+  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  theme + theme(legend.position = "none") 
 
 # risk ratio
 method = c("ML", "PML")
@@ -325,17 +332,18 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method,
   geom_text(aes(label = round(est, 1)), 
             vjust = -0.7, size = ann_size, color = ann_color) +
   coord_flip() + 
+  scale_y_log10() +
   labs(title = "Risk Ratio") +
   labs(x = "Method") + 
-  labs(y = "Risk Ratio") +
+  labs(y = "Risk Ratio (Log Scale)") +
   annotate("text", y = 10.7, x = 0.7, label = caption,
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	theme + theme(legend.position = "none") 
+  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  theme + theme(legend.position = "none")
 
 # combine plots
-pdf("manuscript/figs/weisiger-qis.pdf", width = 8, height = 6)
+pdf("manuscript/figs/ge-qis.pdf", width = 8, height = 6)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(2, 2)))
 vplayout <- function(x, y)
@@ -344,3 +352,6 @@ print(prob_gg, vp = vplayout(1, 1:2))
 print(fd_gg, vp = vplayout(2, 1))
 print(rr_gg, vp = vplayout(2, 2))
 dev.off()
+
+
+

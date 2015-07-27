@@ -60,4 +60,11 @@ source("weisiger-replication/R/clean-data.R")
 # do analysis and make plots
 source("weisiger-replication/R/analysis.R")
 
+# ------------------------------ #
+# george and epstein replication #
+# ------------------------------ #
+
+# do analysis and make plots
+source("weisiger-replication/R/analysis.R")
+
 
