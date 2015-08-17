@@ -132,7 +132,7 @@ In small samples, maximum likelihood estimates of logistic regression coefficien
 This bias might be 25 percent or more in plausible scenarios. 
 As a solution, we (re)introduce political scientists to Firth's (\citeyear{Firth1993}) penalty, which removes much of the bias from the usual estimator. 
 We use Monte Carlo simulations to illustrate that penalized maximum likelihood estimation eliminates most of the bias, but also (perhaps more importantly) greatly reduces the variance of the estimate. 
-We illustrate the substantive importance of the penalized estimator with a replication of \cite{Weisiger2014}.
+We illustrate the substantive importance of the penalized estimator with replications of \cite{Weisiger2014} and \cite{GeorgeEpstein1992}.
  \end{quote}
 
 % Remove page number from first page
@@ -237,7 +237,9 @@ These simulation results show that Firth's (1993) bias correction is not trivial
 In small samples, ML estimates of logistic regression coefficients are severely biased.
 The penalty identified by Firth nearly eliminates this bias, and, as a side effect, produces large gains in the efficiency of the estimates. 
 
-\section*{An Application}
+%\section*{An Application}
+\section*{Application}
+\subsection*{Replication of \cite{Weisiger2014}}
 
 To illustrate the potential importance of using the nearly unbiased PML estimator in an application, we reanalyze a portion of the statistical analysis in \cite{Weisiger2014}. 
 Weisiger describes how, after the official end of the war, violence sometimes continues in the form of guerrilla warfare. 
@@ -298,6 +300,33 @@ On the other hand, when country \textit{does have} a coordinating leader, ML sug
 Accordingly, PML suggests smaller effect sizes, whether using a first difference or risk ratio. 
 PML shrinks the estimated first difference by 19\% from 0.75 to 0.61 and the risk ratio by 24\% from 4.2 to 3.2.
 
+\subsection*{Replication of \cite{GeorgeEpstein1992}}
+
+In another application, we reanalyze the statistical analysis of the integrated model of U.S. Supreme Court decisions developed by \cite{GeorgeEpstein1992}. The authors combine the legal and extralegal models of  Court decision making in order to overcome the complementary idiosyncratic shortcomings of each. The legal model claims \emph{stare decisis}, or the rule of law, as the key determinant of future decisions while the extralegal model takes a behavioralist approach containing an array of sociological, psychological, and political factors. 
+
+Like the previous example of the replication of \cite{Weisiger2014}, George and Epstein's sample consists of 64 Court decisions involving capital punishment from 1971 to 1988. They originally use maximum likelihood estimation so we reanalyze their data using both ML and PML to demonstrate the difference in the estimates with such a small sample. Figure \ref{fig:ge-coefs} illustrates the shift in coefficient estimates. In all cases, the PML estimate is smaller than the ML estimate. Each coefficient decreases by at least 25\% with three decreasing by more than 40\%: court change, the largest, at 49\%, solicitor general at 48\%, and political environment with 41\%. Additionally, the PML standard errors are all smaller than their ML counterparts. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/ge-coefs.pdf}
+\caption{This figure shows the coefficients for a logistic regression model estimating U.S. Supreme Court Decisions by both ML and PML. Note that the PML estimates are smaller with narrower variances than those of ML}\label{fig:ge-coefs}
+\end{center}
+\end{figure}
+
+We use out-of-sample prediction to evaluate the performance of each model, as we are unable know the true model. Using leave-one-out cross-validation and summarizing the prediction errors with both Brier and log scores, we can be confident in our assertion that the PML process outperforms the ML. The ML estimates produce a Brier score of 0.17, and the PML estimates lower the Brier score by 8\% to 0.16. Similarly, the ML estimates produce a log score of 0.89, while the PML estimates lower the log score by 41\% to 0.53. 
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width = \textwidth]{figs/ge-qis.pdf}
+\caption{This figure shows the quantities of interest for the effect of the solicitor general filing a brief amicus curiae on the probability of a decision in favor of capital punishment.}\label{fig:ge-qis}
+\end{center}
+\end{figure}
+
+Again, because we are using maximum likelihood, we are likely more interested in the functions of the coefficients rather than the coefficients themselves. For instance, we take George and Epstein's integrated model of Court decisions to determine the first difference and risk ratio for the probability of whether or not the Court decided in favor of capital punishment. We take whether or not the solicitor general filed an amicus curiae brief (coded as 1 if yes, 0 otherwise) and hold all other explanatory variables constant at their medians. Figure \ref{fig:ge-qis} shows the estimates of the quantities of interest.
+
+As we know, PML pools the estimated probabilities toward, zero such that in the absence of an amicus curiae brief filed by the solicitor general, the PML estimates suggest 17\% chance of the Court deciding in favor of capital punishment while ML estimates a 6\% chance. When an amicus curiae brief was filed by the solicitor general, the Court has a 53\% chance of deciding in favor of capital punishment as compared to the 60\% chance suggested by ML. Thus, PML also provides smaller effect sizes, as well, for both the first difference and the risk ratio. PML decreases the estimated first difference by 35\% and the risk ratio by 75\%. 
+
 \section*{Conclusion}
 
 The substantial difference in these estimates demonstrates the potential importance of using PML when dealing with small samples and binary outcomes.
@@ -311,8 +340,8 @@ Indeed, the PML estimates exhibit less bias, smaller variance, and lower mean sq
 \newpage
 \normalsize
 \bibliographystyle{apsr_fs}
-\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
-%\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
+%\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
+\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
 
 \newpage
 \begin{appendix}
