@@ -97,7 +97,7 @@ gg <- ggplot(subset(models_df, var_name_print != "Intercept"),
   labs(x = NULL) +
   labs(color = "Method", linetype = "Method") + 
   scale_color_manual(values = c("#998ec3", "#f1a340")) +
-  annotate("text", .7, 10, label = "N = 35 (14 events)", 
+  annotate("text", .7, 8, label = "N = 64 (29 events)", 
            color = ann_color, size = ann_size) + 
   theme
 ggsave("manuscript/figs/ge-coefs.pdf", gg,
@@ -304,7 +304,7 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method,
   labs(title = "First Difference") +
   labs(x = "Method") + 
   labs(y = "First Difference") +
-  annotate("text", y = 0.7, x = 0.7, label = caption, 
+  annotate("text", y = 0.54, x = 0.7, label = caption, 
            size = ann_size,
            color = ann_color) + 
   scale_color_manual(values = c("#998ec3", "#f1a340")) +

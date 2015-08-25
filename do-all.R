@@ -1,5 +1,6 @@
 
-# note: make sure that the working directory is set to the project folder.
+# note: make sure that the working directory is set to the project folder, e.g., 
+# setwd("~/Dropbox/projects/small-sample-logit")
 
 # clear working directory
 rm(list = ls())
@@ -12,7 +13,7 @@ run_sims <- FALSE  # it takes about 5 hours to run these
 if (install_packages == TRUE) {
   # install packages from CRAN
   install.packages(c("readr", "dplyr", "tidyr", "ggplot2", "arm", "texreg",
-                     "brglm", "scoring"))
+                     "brglm", "scoring", "gridExtra", "scales"))
   # install packages from github
   install.packages("devtools")
   devtools::install_github("carlislerainey/separation")
@@ -24,6 +25,7 @@ library(dplyr)  # for data management
 library(tidyr)  # for spreading data
 library(ggplot2)  # for graphics
 library(grid)  # for drawing graphics in grids
+library(gridExtra)  # more grid tools
 library(arm)  # for rescale()
 library(texreg)  # for printing tables of coefs
 library(MASS)  # for mvrnorm()
@@ -31,6 +33,7 @@ library(brglm)  # for pmle
 library(logistf)  # for pmle
 library(scoring)  # for Brier- and log-scores
 library(separation)  # for calculating qis (from GitHub)
+library(scales)  # for use with ggplot
 
 # set seed
 # > runif(1)
@@ -65,6 +68,6 @@ source("weisiger-replication/R/analysis.R")
 # ------------------------------ #
 
 # do analysis and make plots
-source("weisiger-replication/R/analysis.R")
+source("ge-replication/R/analysis.R")
 
 
