@@ -1,5 +1,5 @@
 * set working directory and load data
-cd "~/dropbox/projects/small"
+cd "your working directory"
 insheet using "stata/GE.csv", clear
 
 * install firthlogit
