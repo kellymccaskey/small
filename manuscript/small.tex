@@ -448,7 +448,8 @@ This example code is available at \href{https://github.com/kellymccaskey/small/b
 
 # load data from web
 library(readr)  # for read_csv()
-weisiger <- read_csv("https://raw.githubusercontent.com/kellymccaskey/small/master/weisiger-replication/data/weisiger.csv") 
+weisiger <- read_csv("https://raw.githubusercontent.com/kellymccaskey/small/master/weisiger-
+	replication/data/weisiger.csv") 
 
 # quick look at data
 library(dplyr)  # for glimpse()
@@ -494,6 +495,33 @@ screenreg(m2)
 help(brglm)
 \end{verbatim}
 \end{footnotesize}
+
+\section{Penalized Maximum Likelihood Estimation of Logistic Regression Models in Stata}\label{sec:pmle-in-stata}
+
+This example code is available at \href{https://github.com/kellymccaskey/small/blob/master/stata/example.do}{https://github.com/kellymccaskey/small/blob/master/stata/example.do}.
+
+\noindent The example data used is available at \href{https://github.com/kellymccaskey/small/blob/master/stata/GE.dta}{https://github.com/kellymccaskey/small/blob/master/stata/ge.csv}.
+
+\begin{footnotesize}
+\begin{verbatim}
+* set working directory and load data
+* data can be found at https://github.com/kellymccaskey/small/blob/master/stata/ge.csv
+cd "your working directory"
+insheet using "ge.csv", clear
+
+* install firthlogit
+findit firthlogit
+
+* estimate logistic regression with pmle 
+* see coefficient values, standard errors, p-values, etc.
+firthlogit court dq cr pc ag sp pe cc ap dc st sg 
+
+* see help file for more 
+help firthlogit
+
+\end{verbatim}
+\end{footnotesize}
+
 
 \section{Additional Simulation Results}\label{sec:app-sims}
 
