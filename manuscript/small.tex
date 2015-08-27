@@ -184,8 +184,8 @@ Taking logs yields the penalized log-likelihood function.
 Then the researcher can obtain the \emph{penalized} maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$. 
 \cite{Zorn2005} suggested Firth's penalty for solving the problem of separation (see also \citealt{Rainey-separation}), but the broader application to small sample problems seems to have gone unnoticed in political science.
 
-A researcher can implement PML just as easily as ML, but PML estimates of logistic regression coefficients are both less biased \citep{Firth1993} and less variable (\citealt[p. 49]{Kosmidis2007}; \citealt{Copas1988}) than ML estimates.\footnote{Further, the penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages. 
-See the Section \ref{sec:pmle-in-R} of the Appendix for an example.}
+A researcher can implement PML just as easily as ML, but PML estimates of logistic regression coefficients are both less biased \citep{Firth1993} and less variable (\citealt[p. 49]{Kosmidis2007}; \citealt{Copas1988}) than ML estimates.\footnote{Further, the penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages and in Stata with \texttt{firthlogit}. 
+See the Section \ref{sec:pmle-in-R} and Section \ref{sec:pmle-in-stata} of the Appendix, respectively, for an example.}
 This is important to note. 
 When choosing between estimators, researchers often face a tradeoff between bias and variance \citep[pp. 37-38]{HastieTibshiraniFriedman2013}.
 But there is no bias-variance tradeoff between ML and PML estimators.
@@ -363,10 +363,10 @@ PML shrinks the estimated first difference by 19\% from 0.75 to 0.61 and the ris
 \section*{Replication of \cite{GeorgeEpstein1992}}
 
 In another application, we reanalyze the statistical analysis of the integrated model of U.S. Supreme Court decisions developed by \cite{GeorgeEpstein1992}. 
-The authors combine the legal and extralegal models of  Court decision making in order to overcome the complementary idiosyncratic shortcomings of each. 
+The authors combine the legal and extralegal models of Court decision making in order to overcome the complementary idiosyncratic shortcomings of each. 
 The legal model claims \emph{stare decisis}, or the rule of law, as the key determinant of future decisions while the extralegal model takes a behavioralist approach containing an array of sociological, psychological, and political factors. 
 
-Like the previous example of the replication of \cite{Weisiger2014}, George and Epstein's sample consists of 64 Court decisions involving capital punishment from 1971 to 1988. 
+Like the previous example of the replication of \cite{Weisiger2014}, George and Epstein's sample is relatively small, consisting of 64 Court decisions involving capital punishment from 1971 to 1988. 
 They originally use maximum likelihood estimation so we reanalyze their data using both ML and PML to demonstrate the difference in the estimates with such a small sample. 
 Figure \ref{fig:ge-coefs} illustrates the shift in coefficient estimates. 
 In all cases, the PML estimate is smaller than the ML estimate. 
@@ -420,7 +420,7 @@ However, we agree with \cite{Long1997} that without evidence to the contrary, th
 
 Finally, researchers might simply use penalized maximum likelihood, which allows the researcher to keep the theoretically-appealing ``S''-shaped functional form, but greatly reduce the bias \textit{and} variance. 
 Indeed, the penalized maximum likelihood estimates are always less biased and always less variable than the maximum likelihood estimates.
-These improvements are substantial and come at almost no cost to researchers in learning new concepts or software beyond maximum likelihood and simple commands in R and/or Stata.\footnote{Appendix \ref{sec:pmle-in-R} offers a quick overview of computing penalized maximum likelihood estimates in R.} 
+These improvements are substantial and come at almost no cost to researchers in learning new concepts or software beyond maximum likelihood and simple commands in R and/or Stata.\footnote{Appendix \ref{sec:pmle-in-R} offers a quick overview of computing penalized maximum likelihood estimates in R and Appendix \ref{sec:pmle-in-stata} the same in Stata.} 
 We see this as the most attractive option. 
 Whenever researchers have concerns about bias and variance due to a small sample, a simple change to a penalized maximum likelihood estimator can easily ameliorate any concerns. 
 
@@ -428,8 +428,8 @@ Whenever researchers have concerns about bias and variance due to a small sample
 \newpage
 \normalsize
 \bibliographystyle{apsr_fs}
-\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
-%\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
+%\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
+\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
 
 \newpage
 \begin{appendix}
