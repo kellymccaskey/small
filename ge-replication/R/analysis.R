@@ -241,39 +241,37 @@ sims_mle <- mvrnorm(10000, coef(mle), vcov(mle))
 sims_pmle <- mvrnorm(10000, coef(pmle), vcov(pmle))
 
 # calculate qis
-qi_mle <- qi(mle, sims_mle, "sg")
+qi_mle <- qi(mle, sims_mle, "st")
 qi_mle_est <- with(qi_mle, est_df)
 qi_mle_sims <- with(qi_mle, sims_df)
-qi_pmle <- qi(pmle, sims_pmle, "sg")
+qi_pmle <- qi(pmle, sims_pmle, "st")
 qi_pmle_est <- with(qi_pmle, est_df)
 qi_pmle_sims <- with(qi_pmle, sims_df)
 
 method <- c("ML", "ML", "PML", "PML")
-sg <- c("Solicitor General Files Amicus Brief", 
-           "Solicitor General Does Not File Amicus Brief",
-           "Solicitor General Files Amicus Brief", 
-           "Solicitor General Does Not File Amicus Brief")
+st <- rep(c("Repeat Player", 
+           "Not a Repeat Player"), 2)
 prob <- c(with(qi_mle_est, p_hi_est),
           with(qi_mle_est, p_lo_est),
           with(qi_pmle_est, p_hi_est),
           with(qi_pmle_est, p_lo_est))
-prob_df <- data_frame(method, sg, prob)
+prob_df <- data_frame(method, st, prob)
 cat("\npredicted probabilities\n")
 print(as.data.frame(prob_df))
 
 # plot
-prob_df <- mutate(prob_df, sg = reorder(factor(sg), prob))
-prob_gg <- ggplot(prob_df, aes(x = sg, y = prob, color = method)) +
+prob_df <- mutate(prob_df, st = reorder(factor(st), prob))
+prob_gg <- ggplot(prob_df, aes(x = st, y = prob, color = method)) +
   geom_point(size = 2.2) + 
-  geom_line(aes(x = as.numeric(sg)), size = 0.7) + 
-  scale_y_continuous(limits = c(0, 1)) +
+  geom_line(aes(x = as.numeric(st)), size = 0.7) + 
+  scale_y_continuous(limits = c(0, 0.75)) +
   labs(title = "Probability of a Conservative Decision") +
   labs(x = "") + 
   labs(y = "Probability") +
   labs(color = "Method") +
   annotate("text", x = c(2, 1, 2, 1), y = prob, label = round(prob, 2), 
            hjust = c(-0.3, 1.3, -0.3, 1.3), 
-           vjust = c(0.5, 1.0, 0.5, 0.0), 
+           vjust = c(0.8, 1.0, -0.2, 0.0), 
            size = ann_size,
            color = ann_color) + 
   scale_color_manual(values = c("#998ec3", "#f1a340")) +
@@ -332,11 +330,11 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method,
   geom_text(aes(label = round(est, 1)), 
             vjust = -0.7, size = ann_size, color = ann_color) +
   coord_flip() + 
-  scale_y_log10() +
+  scale_y_log10(limits = c(1, 120)) +
   labs(title = "Risk Ratio") +
   labs(x = "Method") + 
   labs(y = "Risk Ratio (Log Scale)") +
-  annotate("text", y = 10.7, x = 0.7, label = caption,
+  annotate("text", y = 20, x = 0.7, label = caption,
            size = ann_size,
            color = ann_color) + 
   scale_color_manual(values = c("#998ec3", "#f1a340")) +

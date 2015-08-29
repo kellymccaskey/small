@@ -67,17 +67,17 @@ grid.arrange(gg1, gg2, ncol=2)
 dev.off()
 
 # create factors
-sims <- mutate(sims, k_factor = factor(paste("N. Variables = ", k, sep = "")))
-sims <- mutate(sims, b0_factor = factor(paste("Intercept = ", b0, sep = "")))
+sims <- mutate(sims, k_factor = factor(paste("k == ", k, sep = "")))
+sims <- mutate(sims, b0_factor = factor(paste("beta[cons] == ", b0, sep = "")))
 sims <- mutate(sims, b0_factor = reorder(b0_factor, prop_ones))
 
 # basic plot
 cat("\n\nmaking and saving plots...\n\n")
 gg <- ggplot(sims, aes(x = n, color = method, linetype = method)) + 
-  facet_grid(k_factor ~ b0_factor) +
+  facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme + 
 	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	labs(x = "Sample Size", 
+	labs(x = "Sample Size (N)", 
   		 color = "Method", linetype = "Method")
 
 # ev
