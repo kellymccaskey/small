@@ -214,7 +214,8 @@ Notice that in the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 3
 This is a rather extreme case, but the MSE inflation only barely drops below 10\% for the most information-rich parameter combinations (e.g., $\beta_{cons} = 0$, $k = 2$, and $N = 2100$). 
 The MSE for the ML estimator is more than 100\% larger than the PML estimator for about 13\% of the combinations, more than 50\% larger for about 24\% of the combinations, and more than 25\% larger for 49\% of the combinations. 
 These differences are certainly large enough to command the attention of researchers working with small data sets.
-\begin{figure}[H]
+
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/sims-mse-infl.pdf}
 \caption{This figure shows the percent increase in the mean square error of $\hat{\beta}^{mle}$ compared to $\hat{\beta}^{pmle}$.}\label{fig:mse-infl}
@@ -229,11 +230,9 @@ MSE^\Uparrow = \overbrace{100 \times \dfrac{Var(\hat{\beta})}{Var(\hat{\beta}^{p
 \noindent which allows us to easily see the contribution of the bias and variance to the total MSE.
 We can simply plug in the simulation estimates of the bias and variance of each estimator to obtain the contribution of each.
 But notice that we can easily compare the \textit{relative} contributions of the bias and variance using the ratio 
-
 \begin{equation}\label{eqn:rel-contrib}
 \text{relative contribution of variance} = \dfrac{\text{contribution of variance}}{\text{contribution of bias}} \text{ .} 
 \end{equation}
-
 \noindent Figure \ref{fig:relcontrib-n-scatter} shows the relative contribution of the variance as the sample size increases. 
 Values less than one indicate that the bias makes a greater contribution and values greater than one indicate that the variance makes a greater contribution. 
 In each case, the variance is much larger than one. 
@@ -241,6 +240,7 @@ For $N = 30$, the contribution of the variance is between 7 and 36 times larger 
 For $N = 210$, the contribution of the variance is between 25 and 180 times larger than the contribution of the bias. 
 In spite of the attention paid to the small sample \textit{bias} in ML estimates of logistic regression coefficients, the small sample \textit{variance} is a more important problem to address. 
 Fortunately, the PML estimator greatly reduces the variance (in addition to shrinking the bias), resulting in a much smaller MSE, especially for smaller samples.
+
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale = 0.7]{figs/relcontrib-n-scatter.pdf}
@@ -302,7 +302,7 @@ For an example, we focus on Weisiger's hypothesis that there will be a greater c
 Setting all other explanatory variables at their sample medians, we calculated the predicted probabilities, the first difference, and the risk ratio for the probability of a post-conflict guerrilla war as countries gain a coordinating leader. 
 Figure \ref{fig:weisiger-qis} shows the estimates of the quantities of interest.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/weisiger-qis.pdf}
 \caption{This figure shows the quantities of interest for the effect of a coordinating leader on the probability of a post-conflict guerrilla war.}\label{fig:weisiger-qis}
@@ -329,7 +329,7 @@ Each coefficient decreases by at least 25\% with three decreasing by more than 4
 Additionally, the PML standard errors are all smaller than their ML counterparts. 
 Three of the 11 coefficients lose their statistical significance.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/ge-coefs.pdf}
 \caption{This figure shows the coefficients for a logistic regression model estimating U.S. Supreme Court Decisions by both ML and PML. Note that the PML estimates are smaller with narrower variances than those of ML}\label{fig:ge-coefs}
@@ -340,7 +340,7 @@ Again, we use out-of-sample prediction to evaluate the performance of each model
 The ML estimates produce a Brier score of 0.17, and the PML estimates lower the Brier score by 8\% to 0.16. 
 Similarly, the ML estimates produce a log score of 0.89, while the PML estimates lower the log score by 41\% to 0.53. 
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width = \textwidth]{figs/ge-qis.pdf}
 \caption{This figure shows the quantities of interest for the effect of the solicitor general filing a brief amicus curiae on the probability of a decision in favor of capital punishment.}\label{fig:ge-qis}
