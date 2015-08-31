@@ -116,7 +116,7 @@ var_infl_df <- spread(var_df, method, var)
 var_infl_df <- mutate(var_infl_df, var_infl = 100*(ML/PML - 1))
 ggplot(var_infl_df, aes(x = n, y = var_infl), size = 1.1) + 
   geom_line() +
-  facet_grid(k_factor ~ b0_factor) +
+  facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme +
 	scale_color_manual(values = c("#998ec3", "#f1a340")) +
 	labs(x = "Sample Size") +
@@ -130,7 +130,7 @@ mse_infl_df <- spread(mse_df, method, mse)
 mse_infl_df <- mutate(mse_infl_df, mse_infl = 100*(ML/PML - 1))
 ggplot(mse_infl_df, aes(x = n, y = mse_infl), size = 1.1) + 
   geom_line() +
-  facet_grid(k_factor ~ b0_factor) +
+  facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme +
   scale_y_log10(limits = c(1, 1000), 
                 breaks = c(1, 10, 100, 1000),
