@@ -103,11 +103,11 @@ In small samples, though, ML estimators sometimes behave quite poorly--especiall
 \section*{The Big Problem with Small Samples}
 
 When working with a binary outcome, the researcher might use logistic regression, modeling the probability of an event as $\text{Pr}(y_i) = \text{Pr}(y_i = 1~|~ X_i) = \dfrac{1}{1 + e^{-X_i\beta}}$, where $y$ represents a vector of binary outcomes, $X$ represents a matrix of explanatory variables and an intercept, and $\beta$ represents a vector of model coefficients.\footnote{To simplify the exposition, we focus on logistic regression models. However, all the ideas apply equally well to probit models.}
-Using this model, it is straightforward to derive the likelihood function
+Using this model, we can derive the likelihood function
 \begin{equation}\nonumber
 \text{Pr}(y | \beta) = L(\beta | y) = \displaystyle \prod_{i = 1}^n \left[\left( \dfrac{1}{1 + e^{-X_i\beta}}\right)^{y_i}\left(1- \dfrac{1}{1 + e^{-X_i\beta}}\right)^{1 - y_i}\right]\text{.}
 \end{equation}
-\noindent As usual, one can take the natural logarithm of both sides to obtain the log-likelihood function
+\noindent As usual, we take the natural logarithm of both sides to obtain the log-likelihood function
 \begin{equation}\nonumber
 \log L(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left(1- \dfrac{1}{1 + e^{-X_i\beta}}\right)\right].
 \end{equation}
@@ -124,24 +124,25 @@ This presents the researcher with a problem: When dealing with small samples, ho
 The statistics literature offers a simple solution to the problem of bias.
 \cite{Firth1993} suggests penalizing the usual likelihood function $L(\beta | y)$ by a factor equal to the square root of the determinant of the information matrix $|I(\beta)|^\frac{1}{2}$, which produces a ``penalized'' likelihood function $L^*(\beta | y) = L(\beta | y)|I(\beta)|^\frac{1}{2}$ (see also \citealt{KosmidisFirth2009} and \citealt{Kosmidis2014}).
 It turns out that this penalty is equivalent to Jeffreys' (\citeyear{Jeffreys1946}) prior for the logistic regression model (\citealt{Firth1993} and \citealt{Poirier1994}).
-Taking logs yields the penalized log-likelihood function.
+We take the natural logarithm of both sides to obtain the \textit{penalized} log-likelihood function.
 \begin{equation}\nonumber
 \log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left(1 - \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + \dfrac{1}{2} \log |I(\beta)|.
 \end{equation}
-Then the researcher can obtain the \emph{penalized} maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$.
-\cite{Zorn2005} suggested Firth's penalty for solving the problem of separation,
+Then the researcher can find the penalized maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$.
+\cite{Zorn2005} suggested PML for solving the problem of separation,
 % (see also \citealt{Rainey-separation})
-but the broader and perhaps more important application to small sample problems seems to have gone unnoticed in political science.
+but the broader and perhaps more important application to small sample problems seems to remain unnoticed in political science.
 
-A researcher can implement PML as easily as ML, but PML estimates of logistic regression coefficients are less biased \citep{Firth1993} and less variable (\citealt[p. 49]{Kosmidis2007}, and \citealt{Copas1988}) than ML estimates.\footnote{The penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages and in Stata with the \texttt{firthlogit} module. See the Section \ref{sec:pmle-in-R} and Section \ref{sec:pmle-in-stata} of the Appendix, respectively, for examples.}
+A researcher can implement PML as easily as ML, but PML estimates of logistic regression coefficients have a smaller bias \citep{Firth1993} and a smaller variance (\citealt[p. 49]{Kosmidis2007}, and \citealt{Copas1988}).\footnote{The penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages and in Stata with the \texttt{firthlogit} module. 
+See the Section \ref{sec:pmle-in-R} and Section \ref{sec:pmle-in-stata} of the Appendix, respectively, for examples.}
 This is important.
 When choosing among estimators, researchers often face a tradeoff between bias and variance \citep[pp. 37-38]{HastieTibshiraniFriedman2013}, but \textit{there is no bias-variance tradeoff between ML and PML estimators}.
 The PML estimator exhibits both lower bias \textit{and} lower variance.
 
-Two concepts from statistical theory help explain the relationship between the ML and PML estimators. 
-Suppose two estimators $A$ and $B$, with squared error loss functions $R^A$ and $R^B$. 
-If $R^A \leq R^B$ for all possible true parameter values and the inequality holds strictly for at least some parameter values, then we can say that estimator B is \textit{inadmissible} and that estimator A \textit{dominates} estimator B. 
-Now suppose a squared error loss function $R$ for the logistic regression coefficients, such that $R^{mle} = E[(\hat{\beta}^{mle} - \beta^{true})^2]$ and $R^{pmle} = E[(\hat{\beta}^{pmle} - \beta^{true})^2]$. 
+Two concepts from statistical theory illuminate the relationship between the ML and PML estimators. 
+Suppose two estimators $A$ and $B$, with quadratic loss function so that the risk functions $R^A$ and $R^B$ (i.e., the expected loss) corresponds to the mean-squared error. 
+If $R^A \leq R^B$ for all parameter values and the inequality holds strictly for at least some parameter values, then we can refer to estimator $B$ as \textit{inadmissible} and say that estimator $A$ \textit{dominates} estimator $B$ (\citealt{DeGrootSchervish2012}, p. 458, and \citealt{LeonardHsu1999}, pp. 143-146). 
+Now suppose a quadratic loss function for the logistic regression coefficients, such that $R^{mle} = E[(\hat{\beta}^{mle} - \beta^{true})^2]$ and $R^{pmle} = E[(\hat{\beta}^{pmle} - \beta^{true})^2]$. 
 In this case, the inequality holds strictly for all $\beta^{true}$ so that $R^{pmle} < R^{mle}$. Thus, we can describe the ML estimator as \textit{inadmissible} and say that the PML estimator \textit{dominates} the ML estimator.
 
 We can say that the PML estimator dominates the ML estimator because the PML estimator has lower bias and variance \textit{regardless of the sample size}. 
@@ -151,7 +152,7 @@ In small samples, though, Monte Carlo simulations show substantial improvements 
 
 \section*{The Big Improvements from an Easy Solution}
 
-To show that the reductions in bias, variance, and mean-squared error are large enough to concern substantive researchers, we conduct a Monte Carlo simulation comparing the sampling distributions of the ML and PML estimates for small sample sizes sometimes found in political science research.
+To show that the size of reductions in bias, variance, and mean-squared error should draw the attention of substantive researchers, we conduct a Monte Carlo simulation comparing the sampling distributions of the ML and PML estimates.
 These simulations demonstrate two features of the ML and PML estimators:
 \begin{enumerate}
 \item In small samples, the ML estimator exhibits a large bias. The PML estimator is nearly unbiased, regardless of sample size.
@@ -159,18 +160,16 @@ These simulations demonstrate two features of the ML and PML estimators:
 \end{enumerate}
 Of course, the increased bias and variance of the ML estimator implies that the PML estimator will also have a smaller mean-squared error.
 
-In our simulation, the true data generating process is always $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X \beta = \beta_{cons} + 0.5 x_1 + \sum_{j = 2}^k 0.2 x_j$.
-We consider the coefficient for $x_1$ as the coefficient of interest.
-Each fixed $x_j$ is drawn from a normal distribution with mean of zero and standard deviation of one.
-The simulation varies the sample size $n$ from 30 to 210, the number of explanatory variables $k$ from 3 to 6 to 9, and the the intercept $\beta_{cons}$ from -1 to -0.5 to 0 (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%).
-We simulate 10,000 data sets for each combination of the simulation parameters and estimate the logistic regression coefficients using ML and PML for each data set. 
-We use these datasets to estimate the percent bias and variance of the ML and PML estimators, as well as the MSE inflation of the ML estimator compared to the PML estimator.
+In our simulation, the true data generating process corresponds to $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X \beta = \beta_{cons} + 0.5 x_1 + \sum_{j = 2}^k 0.2 x_j$, and we focus on the coefficient for $x_1$ as the coefficient of interest.
+We draw each fixed $x_j$ from a normal distribution with mean of zero and standard deviation of one and vary the sample size $n$ from 30 to 210, the number of explanatory variables $k$ from 3 to 6 to 9, and the the intercept $\beta_{cons}$ from -1 to -0.5 to 0 (which, in turn, varies the proportion of events from about 28\% to 38\% to 50\%).
+For each combination of the simulations parameters, we draw 10,000 data sets and use each data set to estimate the logistic regression coefficients using ML and PML. 
+From these estimates, we compute the percent bias and variance of the ML and PML estimators, as well as the MSE inflation of the ML estimator compared to the PML estimator.
 
 \subsection*{Bias}
 
-We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the sample size $N$, the intercept $\beta_{cons}$ (i.e., proportion of events), and number of explanatory variables $k$ vary.
+We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the intercept $\beta_{cons}$, the number of explanatory variables $k$, and the sample size $N$ vary.
 Figure \ref{fig:sims-coef-perc-bias} shows the results.
-The sample size varies across the x-axis of each plot and each panel shows a distinct combination of intercept and number of variables in the model.
+The sample size varies across the horizontal-axis of each plot and each panel shows a distinct combination of intercept and number of variables in the model.
 Across the range of the parameters of our sample, the bias of the MLE varies from about 120\% ($\beta_{cons} = -1$, $k = 9$, and $N = 30$) to around 2\% ($\beta_{cons} = 0$, $k = 3$, and $N = 210$).
 The bias in the PMLE, on the other hand, is much smaller.
 For the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the percent bias in the PMLE is only about seven percent.\footnote{Figures \ref{fig:ev} and \ref{fig:bias} in Section \ref{sec:app-sims} of the Appendix show the expected value and (absolute) bias of these estimates.}
@@ -184,11 +183,11 @@ For the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the pe
 
 \subsection*{Variance}
 
-In many cases, estimators trade off bias and variance, but that is \textit{not} the case for ML and PML.
-Figure \ref{fig:sims-var} shows that, in addition to nearly eliminating the bias, PML also substantially reduces the variance of the estimator, especially for small sample sizes (less than about 75 observations in our simulations).
-For $N = 30$ and $\beta_{cons} = -1$ (about 28\% events), the variance of the ML estimator is about 95\%, 243\%, and 610\% larger than the PML estimator for 3, 6, and 9 variables, respectively.
-For $N = 60$, the variance is about 30\%, 58\% and 91\% larger, respectively. 
-For a larger sample of $N = 210$, the variance is still about 7\%, 10\%, and 14\% larger for the ML estimator.\footnote{Figure \ref{fig:var-infl} in the Appendix shows the variance inflation $= 100 \times \left(\frac{Var(\hat{\beta} ^{mle})}{Var(\hat{\beta}^{pmle})} - 1\right)$.}
+In many cases, estimators trade off bias and variance, but the PML estimator reduces both.
+In addition to nearly eliminating the bias, Figure \ref{fig:sims-var} shows that the PML estimator also substantially reduces the variance, especially for the smaller sample sizes.
+For $\beta_{cons} = -1$ and $N = 30$, the variance of the ML estimator is about 95\%, 243\%, and 610\% larger than the PML estimator for 3, 6, and 9 variables, respectively.
+Doubling the sample size to $N = 60$, the variance remains about 30\%, 58\% and 91\% larger, respectively. 
+Even for a larger sample of $N = 210$, the variance of the ML estimator is about 7\%, 10\%, and 14\% larger for the ML estimator.\footnote{Figure \ref{fig:var-infl} in the Appendix shows the variance inflation $= 100 \times \left(\frac{Var(\hat{\beta} ^{mle})}{Var(\hat{\beta}^{pmle})} - 1\right)$.}
 
 \begin{figure}[h]
 \begin{center}
@@ -199,24 +198,25 @@ For a larger sample of $N = 210$, the variance is still about 7\%, 10\%, and 14\
 
 \subsection*{Mean-Squared Error}
 
-Although both bias and variance alone are important, the mean-squared error (MSE) combines the two into an overall measure of the accuracy of the estimator, where
+However, neither the bias nor the variance serves as a complete summary of the performance of an estimator.
+The mean-squared error (MSE) provides an overall measure of the accuracy of an estimator by combining the bias and variance into a single measure, where
 \begin{align}\label{eqn:mse}
 MSE(\hat{\beta}) &= E[(\hat{\beta} - \beta^{true})^2] \nonumber\\
                             &= Var(\hat{\beta}) + [E(\hat{\beta})]^2 \text{.}
 \end{align}
-Since the bias and the variance of ML estimators are greater than the PML estimator, it follows the the ML estimator must have a larger MSE, so that $MSE(\hat{\beta}^{mle}) - MSE(\hat{\beta}^{pmle}) > 0$.
+Since the bias and the variance of ML estimators exceed the bias and variance the PML estimator, the ML estimator must have a larger MSE, so that $MSE(\hat{\beta}^{mle}) - MSE(\hat{\beta}^{pmle}) > 0$.
 
-We should care about the size of this difference, though, not the sign.
-Take the percent increase in the MSE for the ML estimator compared to the PML estimator as the quantity of interest.
-Refer to this quantity as the ``MSE inflation'' and denote it as $MSE^\Uparrow$, where
+We care about the magnitude of this difference, though, not the sign.
+To summarize the magnitude, we compute the percent increase in the MSE for the ML estimator compared to the PML estimator. 
+We refer to this quantity as the ``MSE inflation'' and denote it as $MSE^\Uparrow$, where
 \begin{equation}\label{eqn:mse-infl}
 MSE^\Uparrow = 100 \times \dfrac{MSE(\hat{\beta}^{mle}) - MSE(\hat{\beta}^{pmle})}{MSE(\hat{\beta}^{pmle})}  \text{ .}
 \end{equation}
 Figure \ref{fig:mse-infl} shows the MSE inflation for each combination of the parameter simulations on the log$_{10}$ scale.
-Notice that in the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the MSE of the ML estimates is about 681\% larger than the MSE of the PML estimates.
+Notice that for the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the MSE of the ML estimates is about 681\% larger than the MSE of the PML estimates.
 The MSE inflation only barely drops below 10\% for the most information-rich parameter combinations (e.g., $\beta_{cons} = 0$, $k = 2$, and $N = 210$).
 The MSE for the ML estimator is more than 100\% larger than the PML estimator for about 13\% of the simulation parameter combinations, more than 50\% larger for about 24\% of the combinations, and more than 25\% larger for 49\% of the combinations.
-These differences are certainly large enough to command the attention of researchers working with small data sets.
+These large sacrifices in MSE should command the attention of researchers working with small data sets.
 
 \begin{figure}[h]
 \begin{center}
@@ -225,24 +225,24 @@ These differences are certainly large enough to command the attention of researc
 \end{center}
 \end{figure}
 
-We might, ask though, about the relative contributions of the bias and variance to this difference.
+However, the larger bias and variance of the ML estimator do not contribute equally to the MSE inflation.
 Substituting Equation \ref{eqn:mse} into Equation \ref{eqn:mse-infl} for $MSE(\hat{\beta}^{mle})$ and $MSE(\hat{\beta}^{pmle})$ and rearranging, we obtain
 \begin{equation}
-MSE^\Uparrow = \overbrace{100 \times \dfrac{Var(\hat{\beta})}{Var(\hat{\beta}^{pmle}) + [E(\hat{\beta}^{pmle})]^2}}^{\text{contribution of variance}} + \underbrace{100 \times \dfrac{[E(\hat{\beta})]^2}{Var(\hat{\beta}^{pmle}) + [E(\hat{\beta}^{pmle})]^2}}_{\text{contribution of bias}}  + 100 \text{ ,} \nonumber
+MSE^\Uparrow = \overbrace{100 \times \dfrac{Var(\hat{\beta})}{Var(\hat{\beta}^{pmle}) + [E(\hat{\beta}^{pmle})]^2}}^{\text{contribution of variance}} + \overbrace{100 \times \dfrac{[E(\hat{\beta})]^2}{Var(\hat{\beta}^{pmle}) + [E(\hat{\beta}^{pmle})]^2}}^{\text{contribution of bias}}  + 100 \text{ ,} \nonumber
 \end{equation}
-\noindent which allows us to easily see the contribution of the bias and variance to the total MSE.
-We can simply plug in the simulation estimates of the bias and variance of each estimator to obtain the contribution of each.
+\noindent which additively separates the contribution of the bias and variance to the MSE inflation.
+If we wanted, we could simply plug in the simulation estimates of the bias and variance of each estimator to obtain the contribution of each.
 But notice that we can easily compare the \textit{relative} contributions of the bias and variance using the ratio
 \begin{equation}\label{eqn:rel-contrib}
 \text{relative contribution of variance} = \dfrac{\text{contribution of variance}}{\text{contribution of bias}} \text{ .}
 \end{equation}
-\noindent Figure \ref{fig:relcontrib-n-scatter} shows the relative contribution of the variance as the sample size increases.
+\noindent Figure \ref{fig:relcontrib-n-scatter} shows the relative contribution of the variance.
 Values less than one indicate that the bias makes a greater contribution and values greater than one indicate that the variance makes a greater contribution.
-In each case, the variance is much larger than one.
+In each case, the relative contribution of the variance is much larger than one.
 For $N = 30$, the contribution of the variance is between 7 and 36 times larger than the contribution of the bias.
 For $N = 210$, the contribution of the variance is between 25 and 180 times larger than the contribution of the bias.
-In spite of the attention paid to the small sample \textit{bias} in ML estimates of logistic regression coefficients, the small sample \textit{variance} is a more important problem to address.
-Fortunately, the PML estimator greatly reduces the variance (in addition to shrinking the bias), resulting in a much smaller MSE, especially for smaller samples.
+In spite of the attention paid to the small sample \textit{bias} in ML estimates of logistic regression coefficients, the small sample \textit{variance} is a more important problem to address, at least in terms of the accuracy of the estimator.
+Fortunately, the PML estimator greatly reduces the bias \textit{and} variance, resulting in a much smaller MSE, especially for smaller samples.
 
 \begin{figure}[h]
 \begin{center}
@@ -252,10 +252,10 @@ Fortunately, the PML estimator greatly reduces the variance (in addition to shri
 \end{figure}
 
 These simulation results show that the bias, variance, and mean-squared error of the ML estimates of logistic regression coefficients are not trivial in small samples.
-These problems cannot be safely ignored.
-Fortunately, Firth's (1993) bias correction is nearly trivial to implement and offers substantial improvements. 
+Researchers cannot safely ignore these problems.
+Fortunately, the researchers can implement the PML estimator with little to no added effort and obtain substantial improvements over the usual ML estimator. 
 And these improvements are not limited to Monte Carlo studies. 
-In the two applications that follow, we show that the PML estimator leads to substantial reductions in the magnitude of the coefficient estimates and in the width of the confidence intervals.
+In the two example applications that follow, we show that the PML estimator leads to substantial reductions in the magnitude of the coefficient estimates and in the width of the confidence intervals.
 
 \section*{The Substantive Importance of the Big Improvements}
 
