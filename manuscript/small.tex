@@ -113,8 +113,7 @@ Using this model, we can derive the likelihood function
 \end{equation}
 \noindent The researcher can find the ML estimate $\hat{\beta}^{mle}$ by finding the vector $\beta$ that maximizes $\log L$ \citep{King1989}.
 
-The ML estimate of the logistic regression coefficient vector $\hat{\beta}^{mle}$ asymptotically unbiased, so that $E(\hat{\beta}^{mle}) \approx \beta^{true}$ when the sample is large (\citealt{Wooldridge2002}, pp. 391-395, and \citealt{CasellaBerger2002}, p. 470). 
-Also, the ML estimate is asymptotically efficient, so that the asymptotic variance of the ML estimate equals the Cramer-Rao lower bound (\citealt{Greene2012}, pp. 513-523, and \citealt{CasellaBerger2002}, pp. 472, 516). 
+The ML estimate of the logistic regression coefficient vector $\hat{\beta}^{mle}$ asymptotically unbiased, so that $E(\hat{\beta}^{mle}) \approx \beta^{true}$ when the sample is large (\citealt{Wooldridge2002}, pp. 391-395, and \citealt{CasellaBerger2002}, p. 470), and asymptotically efficient, so that the asymptotic variance of the ML estimate equals the Cramer-Rao lower bound (\citealt{Greene2012}, pp. 513-523, and \citealt{CasellaBerger2002}, pp. 472, 516). 
 For small samples, though, the ML estimator does not work well--the ML estimates have substantial bias away from zero \citep[pp. 53-54]{Long1997}.
 \citet[p. 54]{Long1997} offers a rough heuristic about appropriate sample sizes: ``It is risky to use ML with samples smaller than 100, while samples larger than 500 seem adequate.''\footnote{Making the problem worse, \cite{KingZeng2001} point out that ML estimates have substantial bias for much larger sample sizes if the event of interest occurs only rarely.}
 This presents the researcher with a problem: When dealing with small samples, how can she obtain reasonable estimates of logistic regression coefficients?
@@ -145,8 +144,7 @@ If $R^A \leq R^B$ for all parameter values and the inequality holds strictly for
 Now suppose a quadratic loss function for the logistic regression coefficients, such that $R^{mle} = E[(\hat{\beta}^{mle} - \beta^{true})^2]$ and $R^{pmle} = E[(\hat{\beta}^{pmle} - \beta^{true})^2]$. 
 In this case, the inequality holds strictly for all $\beta^{true}$ so that $R^{pmle} < R^{mle}$. Thus, we can describe the ML estimator as \textit{inadmissible} and say that the PML estimator \textit{dominates} the ML estimator.
 
-We can say that the PML estimator dominates the ML estimator because the PML estimator has lower bias and variance \textit{regardless of the sample size}. 
-That is, the PML estimator \textit{always} outperforms the ML estimator in terms of bias, variance, and mean-squared error.
+We can say that the PML estimator dominates the ML estimator because the PML estimator has lower bias and variance \textit{regardless of the sample size}--the PML estimator always outperforms the ML estimator in terms of the MSE.
 However, both estimators are asymptotically unbiased and efficient, so the difference between the two estimators becomes negligible as the sample size grows large.
 In small samples, though, Monte Carlo simulations show substantial improvements that should grab the attention of substantive researchers.
 
