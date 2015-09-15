@@ -89,7 +89,7 @@ gg <- ggplot(models_df, aes(var_name_print, est,
 	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 
 	labs(x = NULL) +
 	labs(color = "Method", linetype = "Method") + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	scale_color_manual(values = c("#7570b3", "#d95f02")) +
 	annotate("text", .7, 10, label = "N = 35 (14 events)", 
 					 color = ann_color, size = ann_size) + 
 	theme
@@ -256,20 +256,21 @@ print(as.data.frame(prob_df))
 
 # plot
 prob_df <- mutate(prob_df, coord = reorder(factor(coord), prob))
-prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method)) +
+prob_gg <- ggplot(prob_df, aes(x = coord, y = prob, color = method, linetype = method)) +
   geom_point(size = 2.2) + 
   geom_line(aes(x = as.numeric(coord)), size = 0.7) + 
   scale_y_continuous(limits = c(0, 1)) +
   labs(title = "Probability of a Post-Conflict Guerrilla War") +
   labs(x = "") + 
   labs(y = "Probability") +
-  labs(color = "Method") +
+  labs(color = "Method",
+       linetype = "Method") +
   annotate("text", x = c(2, 1, 2, 1), y = prob, label = round(prob, 2), 
            hjust = c(-0.3, 1.3, -0.3, 1.3), 
            vjust = c(0.5, 1.0, 0.5, 0.0), 
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	scale_color_manual(values = c("#7570b3", "#d95f02")) +
 	theme
 
 # first difference
@@ -300,7 +301,7 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method,
   annotate("text", y = 0.7, x = 0.7, label = caption, 
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	scale_color_manual(values = c("#7570b3", "#d95f02")) +
 	theme + theme(legend.position = "none") 
 
 # risk ratio
@@ -331,7 +332,7 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method,
   annotate("text", y = 10.7, x = 0.7, label = caption,
            size = ann_size,
            color = ann_color) + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
+	scale_color_manual(values = c("#7570b3", "#d95f02")) +
 	theme + theme(legend.position = "none") 
 
 # combine plots

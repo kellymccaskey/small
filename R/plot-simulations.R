@@ -26,7 +26,7 @@ gg1 <- ggplot(sims_wide, aes(x = var_contrib,
                       shape = factor(k),
                       size = n)) + 
   geom_point(alpha = 0.8) +
-  scale_color_brewer(type = "qual", palette = 2) + 
+  scale_color_manual(values = c("#1b9e77", "#7570b3", "#d95f02")) +
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
                 labels = trans_format("log10", math_format(10^.x))) +
   scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
@@ -47,7 +47,7 @@ gg2 <- ggplot(sims_wide, aes(x = n,
                       color = factor(b0),
                       shape = factor(k))) + 
   geom_point(alpha = 0.8, size = 3.3) +
-  scale_color_brewer(type = "qual", palette = 2) + 
+  scale_color_manual(values = c("#1b9e77", "#7570b3", "#d95f02")) +
   #scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
   #              labels = trans_format("log10", math_format(10^.x))) +
   #scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),

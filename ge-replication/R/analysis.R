@@ -96,7 +96,7 @@ gg <- ggplot(subset(models_df, var_name_print != "Intercept"),
   labs(y = "Logit Model Coefficients and 90% Confidence Intervals\n(Intercept Not Shown)") + 
   labs(x = NULL) +
   labs(color = "Method", linetype = "Method") + 
-  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  scale_color_manual(values = c("#7570b3", "#d95f02")) +
   annotate("text", .7, 8, label = "N = 64 (29 events)", 
            color = ann_color, size = ann_size) + 
   theme
@@ -275,7 +275,7 @@ prob_gg <- ggplot(prob_df, aes(x = st, y = prob, color = method, linetype = meth
            vjust = c(0.8, 1.0, -0.2, 0.0), 
            size = ann_size,
            color = ann_color) + 
-  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  scale_color_manual(values = c("#7570b3", "#d95f02")) +
   theme
 
 # first difference
@@ -306,7 +306,7 @@ fd_gg <- ggplot(fd_df, aes(method, est, color = method, linetype = method,
   annotate("text", y = 0.54, x = 0.7, label = caption, 
            size = ann_size,
            color = ann_color) + 
-  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  scale_color_manual(values = c("#7570b3", "#d95f02")) +
   theme + theme(legend.position = "none") 
 
 # risk ratio
@@ -338,7 +338,7 @@ rr_gg <- ggplot(rr_df, aes(method, est, color = method, linetype = method,
   annotate("text", y = 20, x = 0.7, label = caption,
            size = ann_size,
            color = ann_color) + 
-  scale_color_manual(values = c("#998ec3", "#f1a340")) +
+  scale_color_manual(values = c("#7570b3", "#d95f02")) +
   theme + theme(legend.position = "none")
 
 # combine plots
