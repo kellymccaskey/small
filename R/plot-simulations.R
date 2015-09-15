@@ -76,8 +76,8 @@ cat("\n\nmaking and saving plots...\n\n")
 gg <- ggplot(sims, aes(x = n, color = method, linetype = method)) + 
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme + 
-	scale_color_manual(values = c("#998ec3", "#f1a340")) +
-	labs(x = "Sample Size (N)", 
+	scale_color_manual(values = c("#7570b3", "#d95f02")) +
+	labs(x = "Sample Size", 
   		 color = "Method", linetype = "Method")
 
 # ev
@@ -93,7 +93,8 @@ gg + geom_line(aes(y = bias), size = 1.1) +
 ggsave("manuscript/figs/sims-bias.pdf", width = 8, height = 5)
 
 # percent bias
-gg + geom_line(aes(y = percent_bias), size = 1.1) +
+gg + geom_line(aes(y = percent_bias/100), size = 1.1) +
+  scale_y_continuous(labels = percent) + 
   labs(y = "Percent Bias") +
   labs(title = "Percent Bias of ML and PML Estimators")
 ggsave("manuscript/figs/sims-percent-bias.pdf", width = 8, height = 5)
@@ -113,9 +114,10 @@ ggsave("manuscript/figs/sims-mse.pdf", width = 8, height = 5)
 # variance inflation
 var_df <- dplyr::select(sims, n, k_factor, b0_factor, var, method)
 var_infl_df <- spread(var_df, method, var)
-var_infl_df <- mutate(var_infl_df, var_infl = 100*(ML/PML - 1))
+var_infl_df <- mutate(var_infl_df, var_infl = (ML/PML - 1))
 ggplot(var_infl_df, aes(x = n, y = var_infl), size = 1.1) + 
-  geom_line() +
+  geom_line(size = 1.1) +
+  scale_y_continuous(labels = percent) + 
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme +
 	scale_color_manual(values = c("#998ec3", "#f1a340")) +
@@ -127,14 +129,15 @@ ggsave("manuscript/figs/sims-var-infl.pdf", width = 8, height = 5)
 # mse inflation
 mse_df <- dplyr::select(sims, n, k_factor, b0_factor, mse, method)
 mse_infl_df <- spread(mse_df, method, mse)
-mse_infl_df <- mutate(mse_infl_df, mse_infl = 100*(ML/PML - 1))
+mse_infl_df <- mutate(mse_infl_df, mse_infl = (ML/PML - 1))
 ggplot(mse_infl_df, aes(x = n, y = mse_infl), size = 1.1) + 
-  geom_line() +
+  geom_line(size = 1.1) +
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
   theme +
-  scale_y_log10(limits = c(1, 1000), 
-                breaks = c(1, 10, 100, 1000),
-                minor_breaks = NULL) +
+  scale_y_log10(limits = c(0.01, 10), 
+                breaks = c(0.01, 0.1, 1, 10),
+                minor_breaks = NULL,
+                labels = percent) +
   annotation_logticks(sides = "lr") + 
 	labs(x = "Sample Size") +
   labs(y = "Mean-Squared Error Inflation") +

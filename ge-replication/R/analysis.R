@@ -64,21 +64,21 @@ tidy_models <- function(model_list, model_names) {
 }
 
 # tidy model output
-models_df <- tidy_models(list(mle, pmle), c("ML Estimate", "PML Estimate"))
+models_df <- tidy_models(list(mle, pmle), c("ML", "PML"))
 
 # add variable names for printing
 vnp <- c("Intercept",
-         "Death-Qualified",
-         "Crime",
+         "Death-Qualified Jury",
+         "Capital Punishment Proportional to Offense",
          "Particularizing Circumstances",
          "Aggravating Factors",
          "State Psychiatric Examination",
-         "Political Environment",
+         "Conservative Political Environment",
          "Court Change",
-         "Appellant",
-         "Defendant Counsel",
-         "State",
-         "Solicitor General")
+         "State Appellant",
+         "Inexperienced Defense Counsel",
+         "Repeat Player State",
+         "Amicus Brief from Solicitor General")
 models_df <- mutate(models_df, var_name_print = rep(vnp, 2))
 models_df <- mutate(models_df, var_name_print = factor(var_name_print, 
                                                        levels = vnp))
@@ -92,8 +92,8 @@ gg <- ggplot(subset(models_df, var_name_print != "Intercept"),
                             linetype = model_name)) + 
   geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
   coord_flip() + 
-  labs(title = "Logistic Regression Model Explaining\nConservative Court Decisions") + 
-  labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Intercept Not Shown)") + 
+  labs(title = "Logit Model Explaining Conservative Court Decisions") + 
+  labs(y = "Logit Model Coefficients and 90% Confidence Intervals\n(Intercept Not Shown)") + 
   labs(x = NULL) +
   labs(color = "Method", linetype = "Method") + 
   scale_color_manual(values = c("#998ec3", "#f1a340")) +
@@ -261,7 +261,7 @@ print(as.data.frame(prob_df))
 
 # plot
 prob_df <- mutate(prob_df, st = reorder(factor(st), prob))
-prob_gg <- ggplot(prob_df, aes(x = st, y = prob, color = method)) +
+prob_gg <- ggplot(prob_df, aes(x = st, y = prob, color = method, linetype = method)) +
   geom_point(size = 2.2) + 
   geom_line(aes(x = as.numeric(st)), size = 0.7) + 
   scale_y_continuous(limits = c(0, 0.75)) +
@@ -269,6 +269,7 @@ prob_gg <- ggplot(prob_df, aes(x = st, y = prob, color = method)) +
   labs(x = "") + 
   labs(y = "Probability") +
   labs(color = "Method") +
+  labs(linetype = "Method") + 
   annotate("text", x = c(2, 1, 2, 1), y = prob, label = round(prob, 2), 
            hjust = c(-0.3, 1.3, -0.3, 1.3), 
            vjust = c(0.8, 1.0, -0.2, 0.0), 
@@ -293,7 +294,7 @@ cat("\nfirst differences\n")
 print(as.data.frame(fd_df))
 
 # plot
-fd_gg <- ggplot(fd_df, aes(method, est, color = method,
+fd_gg <- ggplot(fd_df, aes(method, est, color = method, linetype = method,
                            ymin = lwr_90, ymax = upr_90)) +
   geom_pointrange(size = 0.7) +
   geom_text(aes(label = round(est, 2)), 
@@ -324,7 +325,7 @@ cat("\nrisk ratios\n")
 print(as.data.frame(rr_df))
 
 # plot
-rr_gg <- ggplot(rr_df, aes(method, est, color = method,
+rr_gg <- ggplot(rr_df, aes(method, est, color = method, linetype = method,
                            ymin = lwr_90, ymax = upr_90)) +
   geom_pointrange(size = 0.7) +
   geom_text(aes(label = round(est, 1)), 

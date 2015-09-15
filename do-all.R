@@ -48,10 +48,14 @@ theme <- theme_bw()
 # ----------------------- #
 
 # do monte carlo simulations
-if (run_sims == TRUE) { source("R/simulations.R") }
+if (run_sims == TRUE) { 
+  source("R/simulations.R") 
+  source("R/sample-size-simulations.R")
+  }
 
 # plot simulation results
 source("R/plot-simulations.R")
+source("R/sample-size-plots.R")
 
 # -------------------- #
 # weisiger replciation #
