@@ -56,8 +56,8 @@
 \begin{document}
 
 \begin{center}
-{\LARGE{\textbf{Estimating Logit Models with Small Samples}}\symbolfootnote[1]{We thank Alex Weisiger, Tracy George, and Lee Epstein for making their data available.
-%We thank Chris Zorn and participants at the 2015 Annual Meeting of the Society for Political Methodology for helpful comments.
+{\LARGE{\textbf{Estimating Logit Models with Small Samples}}\symbolfootnote[1]{We thank Tracy George, Lee Epstein, and Alex Weisiger for making their data available.
+%We thank Scott Cook, Paul Kellstedt, Dan Wood, Chris Zorn, and participants at the 2015 Annual Meeting of the Society for Political Methodology and a seminar at Texas A&M University for helpful comments.
 We conducted these analyses analyses with \texttt{R} 3.2.2.
 All data and computer code necessary for replication are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.}}\\\vspace{2mm}
 
@@ -362,7 +362,8 @@ First, \cite{Peduzzietal1996} recommend about 10 events per explanatory variable
 Second, \citet[p. 54]{Long1997} suggests that ``it is risky to use ML with samples smaller than 100, while samples larger than 500 seem adequate.'' 
 In both of these cases, the alternative to a logit or probit model seems to be no regression at all.
 Here though, we present the PML estimator as an alternative, so we have room to make more conservative recommendations.
-But we do not want or expect researchers to switch from the common and well-understood ML estimator to the PML estimator without a clear improvement in the estimates.
+On the grounds that the PML estimator dominates the ML estimator, we might recommend that researchers always use the PML estimator. 
+But we do not want or expect researchers to switch from the common and well-understood ML estimator to the PML estimator without a clear, meaningful improvement in the estimates.
 
 We measure the cost of using ML rather than PML as the MSE inflation defined in Equation \ref{eqn:mse-infl}--the percent increase in the MSE when using ML rather than PML. 
 The MSE inflation summarizes the relative inaccuracy of the ML estimator compared to the PML estimator.
