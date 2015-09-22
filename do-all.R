@@ -7,7 +7,7 @@ rm(list = ls())
 
 # some options
 install_packages <- FALSE
-run_sims <- FALSE  # it takes about 5 hours to run these
+run_sims <- TRUE  # it takes about 5 hours to run these
 
 # install packages
 if (install_packages == TRUE) {
@@ -48,10 +48,10 @@ theme <- theme_bw()
 # ----------------------- #
 
 # do monte carlo simulations
-if (run_sims == TRUE) { 
+#if (run_sims == TRUE) { 
   source("R/simulations.R") 
-  source("R/sample-size-simulations.R")
-  }
+  #source("R/sample-size-simulations.R")
+#  }
 
 # plot simulation results
 source("R/plot-simulations.R")

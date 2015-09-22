@@ -72,7 +72,7 @@ cat("\n\ndoing simulations...\n\n")
 k <- c(3, 6, 9) #seq(1, 10, by = 1)
 
 # set sample sizes
-n <- seq(30, 250, by = 10)
+n <- seq(30, 210, by = 10)
 
 # set values of intercept
 b0 <- c(-1, -0.5, 0) #seq(-1, 0, by = 0.1)
@@ -81,7 +81,7 @@ b0 <- c(-1, -0.5, 0) #seq(-1, 0, by = 0.1)
 b1 <- 0.5
 
 # number of mc simulations
-n.sims <- 20000
+n.sims <- 10000
 
 # create holder for simulations
 sims <- NULL

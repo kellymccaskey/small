@@ -129,7 +129,8 @@ This presents the researcher with a problem: When dealing with small samples, ho
 \section*{An Easy Solution for the Big Problem}
 
 The statistics literature offers a simple solution to the problem of bias.
-\cite{Firth1993} suggests penalizing the usual likelihood function $L(\beta | y)$ by a factor equal to the square root of the determinant of the information matrix $|I(\beta)|^\frac{1}{2}$, which produces a ``penalized'' likelihood function $L^*(\beta | y) = L(\beta | y)|I(\beta)|^\frac{1}{2}$ (see also \citealt{KosmidisFirth2009} and \citealt{Kosmidis2014}).
+\cite{Firth1993} suggests penalizing the usual likelihood function $L(\beta | y)$ by a factor equal to the square root of the determinant of the information matrix $|I(\beta)|^\frac{1}{2}$, which produces a ``penalized'' likelihood function $L^*(\beta | y) = L(\beta | y)|I(\beta)|^\frac{1}{2}$ (see also \citealt{KosmidisFirth2009} and \citealt{Kosmidis2014}).\footnote{The statistics literature offers other approaches to bias reduction and correction as well. 
+See \cite{Kosmidis2014} for a useful overview.}
 It turns out that this penalty is equivalent to Jeffreys' (\citeyear{Jeffreys1946}) prior for the logit model (\citealt{Firth1993} and \citealt{Poirier1994}).
 We take the natural logarithm of both sides to obtain the \textit{penalized} log-likelihood function.
 \begin{equation}\nonumber
