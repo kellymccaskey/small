@@ -148,7 +148,7 @@ When choosing among estimators, researchers often face a tradeoff between bias a
 The PML estimator exhibits both lower bias \textit{and} lower variance.
 
 Two concepts from statistical theory illuminate the relationship between the ML and PML estimators. 
-Suppose two estimators $A$ and $B$, with a quadratic loss function so that the risk functions $R^A$ and $R^B$ (i.e., the expected loss) corresponds to the mean-squared error (MSE). 
+Suppose two estimators $A$ and $B$, with a quadratic loss function so that the risk functions $R^A$ and $R^B$ (i.e., the expected loss) correspond to the mean-squared error (MSE). 
 If $R^A \leq R^B$ for all parameter values and the inequality holds strictly for at least some parameter values, then we can refer to estimator $B$ as \textit{inadmissible} and say that estimator $A$ \textit{dominates} estimator $B$ (\citealt{DeGrootSchervish2012}, p. 458, and \citealt{LeonardHsu1999}, pp. 143-146). 
 Now suppose a quadratic loss function for the logit model coefficients, such that $R^{mle} = E[(\hat{\beta}^{mle} - \beta^{true})^2]$ and $R^{pmle} = E[(\hat{\beta}^{pmle} - \beta^{true})^2]$. 
 In this case, the inequality holds strictly for all $\beta^{true}$ so that $R^{pmle} < R^{mle}$. Thus, we can describe the ML estimator as \textit{inadmissible} and say that the PML estimator \textit{dominates} the ML estimator.
@@ -283,7 +283,7 @@ These simulation results show that the bias, variance, and MSE of the ML estimat
 Researchers cannot safely ignore these problems.
 Fortunately, researchers can implement the PML estimator with little to no added effort and obtain substantial improvements over the usual ML estimator. 
 And these improvements are not limited to Monte Carlo studies. 
-In the two example application that followa, we show that the PML estimator leads to substantial reductions in the magnitude of the coefficient estimates and in the width of the confidence intervals.
+In the example application that follows, we show that the PML estimator leads to substantial reductions in the magnitude of the coefficient estimates and in the width of the confidence intervals.
 
 \section*{The Substantive Importance of the Big Improvements}
 
@@ -320,13 +320,6 @@ We choose to take the negative of $\sum_{i = 1}^n log(r_i)$, so that, like the B
 The ML estimates produce a Brier score of 0.17, and the PML estimates lower the Brier score by 8\% to 0.16.
 Similarly, the ML estimates produce a log score of 0.89, while the PML estimates lower the log score by 41\% to 0.53.
 The PML estimates outperform the ML estimates for both approaches to scoring, and this provides good evidence that the PML estimates better capture the data generating process.
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width = \textwidth]{figs/ge-qis.pdf}
-\caption{This figure shows the quantities of interest for the effect of the solicitor general filing a brief amicus curiae on the probability of a decision in favor of capital punishment.}\label{fig:ge-qis}
-\end{center}
-\end{figure}
 
 Because we estimate a logit model, we are likely more interested in the functions of the coefficients rather than the coefficients themselves \citep{KingTomzWittenberg2000}.
 For an example, we take George and Epstein's integrated model of Court decisions and calculate a first difference and risk ratio as the repeat-player status of the state varies, setting all other explanatory variables at their medians.
@@ -460,8 +453,8 @@ Whenever researchers have concerns about bias and variance due to a small sample
 \singlespace
 \normalsize
 \bibliographystyle{apsr_fs}
-\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
-%\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
+%\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
+\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
 
 \newpage
 \begin{appendix}
