@@ -4,7 +4,7 @@ ann_size <- 3
 ann_color <- "grey50"
 
 # read data
-sims1 <- read.csv("R/simulations/sims.csv", stringsAsFactors = FALSE)
+sims <- read.csv("R/simulations/sims.csv", stringsAsFactors = FALSE)
 
 # create table of simulation estimates of bias and variance
 sims_table <- dplyr::select(sims, n, k, b0, method, bias, var)

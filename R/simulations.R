@@ -38,6 +38,7 @@ simulate <- function(n, k, b0, b1) {
                      true_coef = true.coef,
                      method = "ML",
                      ev = mean(mle.coef),
+                     mc_error_ev = sd(mle.coef)/sqrt(n.sims),
                      bias = mean(mle.coef) - true.coef,
                      percent_bias = 100*(mean(mle.coef)/true.coef - 1),
                      var = var(mle.coef),
@@ -52,6 +53,7 @@ simulate <- function(n, k, b0, b1) {
                      true_coef = true.coef,
                      method = "PML",
                      ev = mean(pmle.coef),
+                     mc_error_ev = sd(pmle.coef)/sqrt(n.sims),
                      bias = mean(pmle.coef) - true.coef,
                      percent_bias = 100*(mean(pmle.coef)/true.coef - 1),
                      var = var(pmle.coef),
@@ -81,7 +83,7 @@ b0 <- c(-1, -0.5, 0) #seq(-1, 0, by = 0.1)
 b1 <- 0.5
 
 # number of mc simulations
-n.sims <- 10000
+n.sims <- 50000
 
 # create holder for simulations
 sims <- NULL

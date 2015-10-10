@@ -952,7 +952,7 @@ FUNCTION {phdthesis}
     { skip$ }
     { title "title" output.check }
   if$
-  "PhD thesis" format.thesis.type output.nonnull
+  "PhD Disseration" format.thesis.type output.nonnull
   school "school" output.check
   format.address output
   new.block
