@@ -84,7 +84,7 @@ We use Monte Carlo simulations and a re-analysis of \cite{GeorgeEpstein1992} to 
 
  \vspace{5mm}
  \begin{center}
- Approximate Word Count: 4,848
+ Approximate Word Count: 5,378
  \end{center}
 
 % Remove page number from first page
@@ -202,7 +202,7 @@ We draw each fixed $x_j$ from a normal distribution with mean of zero and standa
 
 Each parameter in our simulation varies the amount of information in the data set.
 The biostatistics literature uses the number of events per explanatory variable $\frac{1}{k}\sum y_i$ as a measure of the information in the data set (e.g., \citealt{Peduzzietal1996} and \citealt{VittinghoffMcCulloch2007}), and each parameter of our simulation varies this quantity, where $ \frac{N \times P_{cons}}{k} \approx \frac{1}{k}\sum y_i$.
-For each combination of the simulation parameters, we draw 50,000 data sets and use each data set to estimate the logit model coefficients using ML and PML. 
+For each combination of the simulation parameters, we draw 50,000 data sets and use each data set to estimate the logit model coefficients using ML and PML. To avoid an unfair comparison, we exclude the ML estimates where separation occurs \citep{Zorn2005}.
 From these estimates, we compute the percent bias and variance of the ML and PML estimators, as well as the MSE inflation of the ML estimator compared to the PML estimator.
 
 \subsection*{Bias}
@@ -210,9 +210,9 @@ From these estimates, we compute the percent bias and variance of the ML and PML
 We calculate the percent bias $= 100 \times \left(\frac{E(\hat{\beta})}{\beta^{true}} - 1 \right)$ as the intercept $\beta_{cons}$, the number of explanatory variables $k$, and the sample size $N$ vary.
 Figure \ref{fig:sims-coef-perc-bias} shows the results.
 The sample size varies across the horizontal-axis of each plot and each panel shows a distinct combination of intercept and number of variables in the model.
-Across the range of the parameters of our sample, the bias of the MLE varies from about 120\% ($\beta_{cons} = -1$, $k = 9$, and $N = 30$) to around 2\% ($\beta_{cons} = 0$, $k = 3$, and $N = 210$).
-The bias in the PMLE, on the other hand, is much smaller.
-For the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the ML estimate has an upward bias of about 120\%, while the PML estimate has an upward bias of only about 7\%.\footnote{Figures \ref{fig:ev} and \ref{fig:bias} in Section \ref{sec:app-sims} of the Appendix show the expected value and (absolute) bias of these estimates.}
+Across the range of the parameters of our sample, the bias of the ML estimate varies from about 69\% ($\beta_{cons} = -1$, $k = 9$, and $N = 30$) to around 3\% ($\beta_{cons} = 0$, $k = 3$, and $N = 210$).
+The bias in the PML estimate, on the other hand, is much smaller.
+For the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the ML estimate has an upward bias of about 69\%, while the PML estimate has an upward bias of only about 6\%.\footnote{Figures \ref{fig:ev} and \ref{fig:bias} in Section \ref{sec:app-sims} of the Appendix show the expected value and (absolute) bias of these estimates.}
 
 \begin{figure}[h]
 \begin{center}
@@ -225,9 +225,9 @@ For the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the ML
 
 In many cases, estimators trade off bias and variance, but the PML estimator reduces both.
 In addition to nearly eliminating the bias, Figure \ref{fig:sims-var} shows that the PML estimator also substantially reduces the variance, especially for the smaller sample sizes.
-For $\beta_{cons} = -1$ and $N = 30$, the variance of the ML estimator is about 95\%, 243\%, and 610\% larger than the PML estimator for 3, 6, and 9 variables, respectively.
-Doubling the sample size to $N = 60$, the variance remains about 30\%, 58\% and 91\% larger, respectively. 
-Even for a larger sample of $N = 210$, the variance of the ML estimator is about 7\%, 10\%, and 14\% larger than the PML estimator.\footnote{Figure \ref{fig:var-infl} in the Appendix shows the variance inflation $= 100 \times \left(\frac{Var(\hat{\beta} ^{mle})}{Var(\hat{\beta}^{pmle})} - 1\right)$.}
+For $\beta_{cons} = -1$ and $N = 30$, the variance of the ML estimator is about 80\%, 219\%, and 587\% larger than the PML estimator for 3, 6, and 9 variables, respectively.
+Doubling the sample size to $N = 60$, the variance remains about 30\%, 48\% and 86\% larger, respectively. 
+Even for a larger sample of $N = 210$, the variance of the ML estimator is about 6\%, 10\%, and 15\% larger than the PML estimator.\footnote{Figure \ref{fig:var-infl} in the Appendix shows the variance inflation $= 100 \times \left(\frac{Var(\hat{\beta} ^{mle})}{Var(\hat{\beta}^{pmle})} - 1\right)$.}
 
 \begin{figure}[h]
 \begin{center}
@@ -254,9 +254,9 @@ We refer to this quantity as the ``MSE inflation,'' where
 \end{equation}
 An MSE inflation of zero indicates that the ML and PML estimators perform equally well, but because the PML estimator dominates the ML estimator, the MSE inflation is strictly greater than zero.
 Figure \ref{fig:mse-infl} shows the MSE inflation for each combination of the parameter simulations on the log$_{10}$ scale.
-Notice that for the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the MSE of the ML estimates is about 681\% larger than the MSE of the PML estimates.
+Notice that for the worst-case scenario ($\beta_{cons} = -1$, $k = 9$, and $N = 30$), the MSE of the ML estimates is about 616\% larger than the MSE of the PML estimates.
 The MSE inflation only barely drops below 10\% for the most information-rich parameter combinations (e.g., $\beta_{cons} = 0$, $k = 3$, and $N = 210$).
-The MSE inflation exceeds 100\% for about 13\% of the simulation parameter combinations, 50\% for about 24\% of the combinations, and 25\% for about 49\% of the combinations.
+The MSE inflation exceeds 100\% for about 9\% of the simulation parameter combinations, 50\% for about 21\% of the combinations, and 25\% for about 44\% of the combinations.
 These large sacrifices in MSE should command the attention of researchers working with binary outcomes and small data sets.
 
 \begin{figure}[h]
@@ -280,8 +280,8 @@ But notice that we can easily compare the \textit{relative} contributions of the
 \noindent Figure \ref{fig:relcontrib-n-scatter} shows the relative contribution of the variance.
 Values less than one indicate that the bias makes a greater contribution and values greater than one indicate that the variance makes a greater contribution.
 In each case, the relative contribution of the variance is much larger than one.
-For $N = 30$, the contribution of the variance is between 7 and 36 times larger than the contribution of the bias.
-For $N = 210$, the contribution of the variance is between 25 and 180 times larger than the contribution of the bias.
+For $N = 30$, the contribution of the variance is between 7 and 31 times larger than the contribution of the bias.
+For $N = 210$, the contribution of the variance is between 27 and 140 times larger than the contribution of the bias.
 In spite of the attention paid to the small sample \textit{bias} in ML estimates of logit model coefficients, the small sample \textit{variance} is a more important problem to address, at least in terms of the accuracy of the estimator.
 Fortunately, the PML estimator greatly reduces the bias \textit{and} variance, resulting in a much smaller MSE, especially for small samples.
 
