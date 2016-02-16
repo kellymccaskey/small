@@ -57,18 +57,19 @@
 
 \begin{center}
 {\LARGE{\textbf{Estimating Logit Models with Small Samples}}\symbolfootnote[1]{We thank Tracy George, Lee Epstein, and Alex Weisiger for making their data available.
-%We thank Scott Cook, Soren Jordan, Paul Kellstedt, Dan Wood, and Chris Zorn for helpful comments. We also thank participants at the 2015 Annual Meeting of the Society for Political Methodology and a seminar at Texas A\&M University for helpful comments.
+We thank Scott Cook, Soren Jordan, Paul Kellstedt, Dan Wood, and Chris Zorn for helpful comments. We also thank participants at the 2015 Annual Meeting of the Society for Political Methodology and a seminar at Texas A\&M University for helpful comments.
 We conducted these analyses analyses with \texttt{R} 3.2.2.
-All data and computer code necessary to reproduce our results are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.}
+All data and computer code necessary to reproduce our results are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.
+}
 }\\\vspace{2mm}
 
 \vspace{10mm}
 
-%Kelly McCaskey\symbolfootnote[2]{Kelly McCaskey is a Ph.D. student in the Department of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:kellymccaskey@tamu.edu}{kellymccaskey@tamu.edu}).}
+Kelly McCaskey\symbolfootnote[2]{Kelly McCaskey is a Ph.D. student in the Department of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:kellymccaskey@tamu.edu}{kellymccaskey@tamu.edu}).}
 
 \vspace{3mm}
 
-%Carlisle Rainey\symbolfootnote[3]{Carlisle Rainey is Assistant Professor of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:crainey@tamu.edu}{crainey@tamu.edu}).}
+Carlisle Rainey\symbolfootnote[3]{Carlisle Rainey is Assistant Professor of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:crainey@tamu.edu}{crainey@tamu.edu}).}
 \end{center}
 
 \vspace{10mm}
@@ -80,12 +81,12 @@ In small samples, maximum likelihood (ML) estimates of logit model coefficients 
 As a solution, we introduce political scientists to Firth's (1993) penalized maximum likelihood (PML) estimator.
 The PML estimator eliminates most of the bias and, perhaps more importantly, greatly reduces the variance of the usual ML estimator.
 Thus, researchers do not face a bias-variance tradeoff when choosing between the ML and PML estimators--the PML estimator has a smaller bias \textit{and} a smaller variance.
-We use Monte Carlo simulations and a re-analysis of \cite{GeorgeEpstein1992} to show that the PML estimator offers a substantial improvement in small samples (e.g., 50 observations) and noticeable improvement even in large samples (e.g., 1,000 observations).
+We use Monte Carlo simulations and a re-analysis of \cite{GeorgeEpstein1992} to show that the PML estimator offers a substantial improvement in small samples (e.g., 50 observations) and noticeable improvement even in larger samples (e.g., 1,000 observations).
  \end{quote}
 
  \vspace{5mm}
  \begin{center}
- Approximate Word Count: 5,378
+% Approximate Word Count: 5,378
  \end{center}
 
 % Remove page number from first page
@@ -146,12 +147,14 @@ We take the natural logarithm of both sides to obtain the \textit{penalized} log
 \log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left(1 - \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + \dfrac{1}{2} \log |I(\beta)|.
 \end{equation}
 Then the researcher can find the penalized maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$.
+
 \cite{Zorn2005} suggests PML for solving the problem of separation,
 % (see also \citealt{Rainey-separation})
-but the broader and more important application to small sample problems seems to remain unnoticed in political science.\footnote{We are aware of no published work in political science using PML for bias reduction. 
-We are aware of three \textit{unpublished} papers using PML for bias reduction: \cite{KaplowGartzke2015} use PML to estimate a logit model with a rare outcome, \cite{Betz2015b} uses PML to estimate a Poisson regression model, and \cite{Betz2015a} uses PML to estimate a beta regression model with observations at the boundary.}
+but the broader and more important application to small sample problems seems to remain unnoticed in political science.\footnote{Though we are aware of many published papers that use PML to address the problem of separation (e.g., \citealt{BellMiller2015}; \citealt{ViningWilhelmCollens2015}; \citealt{LeemanMares2014}; and \citealt{BarrilleauxRainey2014}), we are aware of no published work in political science using PML for bias reduction. 
+We are aware of three \textit{unpublished} papers using PML for bias reduction: \cite{KaplowGartzke2015} use PML to estimate a logit model with a rare outcome, \cite{Betz2015b} uses PML to estimate a Poisson regression model, and \cite{Betz2015a} uses PML to estimate a beta regression model with observations at the boundary.} 
+While \cite{HeinzeSchemper2002} and \cite{Zorn2005} recommend using a profile likelihood confidence interval when using PML to address separation, this approach does not usually offer a noticeable improvement when using PML to only address a small-sample bias.\footnote{However, the R package \texttt{logistf} \citep{logistf} that we illustrate in the appendix computes the profile likelihood confidence interval automatically.}
 
-A researcher can implement PML as easily as ML, but PML estimates of logit model coefficients have a smaller bias \citep{Firth1993} and a smaller variance (\citealt[p. 49]{Kosmidis2007}, and \citealt{Copas1988}).\footnote{The penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} or \texttt{brglm} packages and in Stata with the \texttt{firthlogit} module. 
+A researcher can implement PML as easily as ML, but PML estimates of logit model coefficients have a smaller bias \citep{Firth1993} and a smaller variance (\citealt[p. 49]{Kosmidis2007}, and \citealt{Copas1988}).\footnote{The penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} \citep{logistf} or \texttt{brglm} \citep{brglm} packages and in Stata with the \texttt{firthlogit} \citep{firthlogit} module. 
 See the Section \ref{sec:pmle-in-R} and Section \ref{sec:pmle-in-stata} of the Appendix, respectively, for examples.}
 This is important.
 When choosing among estimators, researchers often face a tradeoff between bias and variance \citep[pp. 37-38]{HastieTibshiraniFriedman2013}, but \textit{there is no bias-variance tradeoff between ML and PML estimators}.
@@ -183,6 +186,8 @@ However, \cite{Firth1993} suggests modifying the score function, so that $s^*(y,
 \cite{Firth1993} shows that one good choice of $\gamma$ takes $\gamma_j = \frac{1}{2} \text{trace} \left[ I^{-1} \left( \frac{\partial I}{\partial \beta_j}\right)\right] = \frac{\partial}{\partial \beta_j} \left( \log | I(\beta) | \right)$.
 Integrating, we can see that solving $s^*(y, \hat{\beta}^{pmle}) = 0$ is equivalent to finding $\hat{\beta}^{pmle}$ that maximizes $\log L^*(\beta | y)$ with respect to $\beta$.
 
+The intuition of the variance reduction is straightforward. Because PML shrinks the ML estimates toward zero, the PML estimates must have a smaller variance than the ML estimates. If we imagine the PML estimates as trapped between zero and the ML estimates, then the PML estimates must be less variable.
+
 What can we say about the relative performance of the ML and PML estimators? 
 Theoretically, we can say that the PML estimator \textit{dominates} the ML estimator because the PML estimator has lower bias and variance regardless of the sample size. That is, the PML estimator always outperforms the ML estimator, and least in terms of the bias, variance, and MSE.
 However, both estimators are asymptotically unbiased and efficient, so the difference between the two estimators becomes negligible as the sample size grows large.
@@ -199,11 +204,14 @@ These simulations demonstrate three features of the ML and PML estimators:
 \end{enumerate}
 
 In our simulation, the true data generating process corresponds to $\Pr(y_i = 1) = \frac{1}{1 + e^{-X_i \beta}}$, where $i \in 1, 2,..., n$ and $X \beta = \beta_{cons} + 0.5 x_1 + \sum_{j = 2}^k 0.2 x_j$, and we focus on the coefficient for $x_1$ as the coefficient of interest.
-We draw each fixed $x_j$ from a normal distribution with mean of zero and standard deviation of one and vary the sample size $N$ from 30 to 210, the number of explanatory variables $k$ from 3 to 6 to 9, and the the intercept $\beta_{cons}$ from -1 to -0.5 to 0 (which, in turn, varies the proportion of events $P_{cons}$ from about 0.28 to 0.38 to 0.50).
+We draw each fixed $x_j$ independently from a normal distribution with mean of zero and standard deviation of one and vary the sample size $N$ from 30 to 210, the number of explanatory variables $k$ from 3 to 6 to 9, and the the intercept $\beta_{cons}$ from -1 to -0.5 to 0 (which, in turn, varies the proportion of events $P_{cons}$ from about 0.28 to 0.38 to 0.50).\footnote{Creating a correlation among the $x_j$'s has the same effect as decreasing the sample size.}
 
 Each parameter in our simulation varies the amount of information in the data set.
 The biostatistics literature uses the number of events per explanatory variable $\frac{1}{k}\sum y_i$ as a measure of the information in the data set (e.g., \citealt{Peduzzietal1996} and \citealt{VittinghoffMcCulloch2007}), and each parameter of our simulation varies this quantity, where $ \frac{N \times P_{cons}}{k} \approx \frac{1}{k}\sum y_i$.
-For each combination of the simulation parameters, we draw 50,000 data sets and use each data set to estimate the logit model coefficients using ML and PML. To avoid an unfair comparison, we exclude the ML estimates where separation occurs \citep{Zorn2005}.
+For each combination of the simulation parameters, we draw 50,000 data sets and use each data set to estimate the logit model coefficients using ML and PML. 
+To avoid an unfair comparison, we exclude the ML estimates where separation occurs \citep{Zorn2005}. 
+We keep all the PML estimates.
+Replacing the ML estimates with the PML estimates when separation occurs dampens the difference between the estimators and keeping all the ML estimates exaggerates the differences.
 From these estimates, we compute the percent bias and variance of the ML and PML estimators, as well as the MSE inflation of the ML estimator compared to the PML estimator.
 
 \subsection*{Bias}
@@ -374,18 +382,20 @@ In both of these cases, the alternative to a logit or probit model seems to be n
 Here though, we present the PML estimator as an alternative, so we have room to make more conservative recommendations.
 
 On the grounds that the PML estimator dominates the ML estimator, we might recommend that researchers always use the PML estimator. 
-But we do not want or expect researchers to switch from the common and well-understood ML estimator to the PML estimator without a clear, meaningful improvement in the estimates. We use a Monte Carlo simulation to develop rules of thumb that link the amount of information in the data set to the cost of using ML rather than PML. 
+But we do not want or expect researchers to switch from the common and well-understood ML estimator to the PML estimator without a clear, meaningful improvement in the estimates. 
+We use a Monte Carlo simulation to develop rules of thumb that link the amount of information in the data set to the cost of using ML rather than PML. 
 
 We measure the cost of using ML rather than PML as the MSE inflation defined in Equation \ref{eqn:mse-infl}: the percent increase in the MSE when using ML rather than PML. 
 The MSE inflation summarizes the relative inaccuracy of the ML estimator compared to the PML estimator.
 
-To measure the information in a data set, we follow the biostatistics literature and use the number of events per explanatory variable $\frac{1}{k}\sum y_i$ (e.g., \citealt{Peduzzietal1996} and \citealt{VittinghoffMcCulloch2007}).
-However, this approach assumes that events occur less often than non-events. 
-To generalize this idea to a statistic more suitable to political science data, in which the number of events commonly exceeds the number of non-events, we use a measure of information $\xi$ that takes the minimum of the events and non-events per explanatory variable, so that
+To measure the information in a data set, the biostatistics literature suggests using the number of events per explanatory variable $\frac{1}{k}\sum y_i$ (e.g., \citealt{Peduzzietal1996} and \citealt{VittinghoffMcCulloch2007}).
+However, we modify this metric slightly and consider the minimum of the number of events and the number of non-events. 
+This modified measure, which we denote as $\xi$, has the attractive property of being invariant to flipping the coding of events and non-events. 
+Indeed, one could not magically increase the information in a conflict data set by coding peace-years as ones and conflict-years as zeros.
+With this in mind, we use a measure of information $\xi$ that takes the minimum of the events and non-events per explanatory variable, so that
 \begin{equation}
 \xi = \frac{1}{k}\min \left[ \sum_{i = 1}^n y_i, \sum_{i = 1}^n(1 - y_i) \right]\text{ .}
 \end{equation}
-
 
 The cost of using ML rather than PML decreases continuously with the amount of information in the data set, but to make concrete suggestions, we break the costs into three categories: substantial, noticeable, and negligible.
 We use the following cutoffs.
@@ -465,7 +475,9 @@ Additionally, the LPM sometimes produces nonsense probabilities that fall outsid
 If the researcher is willing to accept these nonsense quantities and assume that the functional form is linear, then the LPM offers a reasonable choice.
 However, we agree with \cite{Long1997} that without evidence to the contrary, the logit or probit model offers a more plausible functional form.
 
-Finally, the researcher might simply use penalized maximum likelihood, which allows the theoretically-appealing ``S''-shaped functional form while greatly reducing the bias \textit{and} variance.
+Fourth, the researcher might use a bootstrap procedure \citep{Efron1979} to correct the bias of the ML estimates. While in general the bootstrap presents a risk of inflating the variance when correcting the bias \citep[esp. pp. 138-139]{EfronTibshirani1993}, simulations suggest that the procedure works comparably to PML in some cases for estimating logit model coefficients. However, the bias-corrected bootstrap has a major disadvantage. When a subset of the bootstrapped data sets have separation \citep{Zorn2005}, which is highly likely with small data sets, then the bootstrap procedure produces unreliable estimates. In this scenario, the bias and variance can be much larger than even the ML estimates and sometimes wildly incorrect. Given the extra complexity of the bootstrap procedure and the risk of unreliable estimates, the bias-corrected bootstrap is not particularly attractive.
+
+Finally, the researcher might simply use penalized maximum likelihood, which allows the theoretically-appealing ``S''-shaped functional form and fast estimation while greatly reducing the bias \textit{and} variance.
 Indeed, the penalized maximum likelihood estimates always have a smaller bias and variance than the maximum likelihood estimates.
 These substantial improvements come at almost no cost to the researcher in learning new concepts or software beyond maximum likelihood and simple commands in R and/or Stata.\footnote{Appendices \ref{sec:pmle-in-R} and \ref{sec:pmle-in-stata} offer a quick overview of computing penalized maximum likelihood estimates in R and Stata, respectively.}
 We see this as the most attractive option.
@@ -474,8 +486,8 @@ Whenever researchers have concerns about bias and variance due to a small sample
 \singlespace
 \normalsize
 \bibliographystyle{apsr_fs}
-%\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
-\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
+\bibliography{/Users/carlislerainey/Dropbox/papers/bibliography/bibliography.bib}
+%\bibliography{/Users/kellymccaskey/Dropbox/projects/bibliography/bibliography.bib}
 
 \newpage
 \begin{appendix}
