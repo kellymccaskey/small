@@ -58,18 +58,19 @@
 \begin{center}
 {\LARGE{\textbf{Estimating Logit Models with Small Samples}}\symbolfootnote[1]{We thank Tracy George, Lee Epstein, and Alex Weisiger for making their data available.
 We thank Scott Cook, Soren Jordan, Paul Kellstedt, Dan Wood, and Chris Zorn for helpful comments. We also thank participants at the 2015 Annual Meeting of the Society for Political Methodology and a seminar at Texas A\&M University for helpful comments.
-We conducted these analyses analyses with \texttt{R} 3.2.2.
+We conducted these analyses with \texttt{R} 3.2.2.
 All data and computer code necessary to reproduce our results are available at \href{https://www.github.com/kellymccaskey/small}{github.com/kellymccaskey/small}.
 }
 }\\\vspace{2mm}
 
 \vspace{10mm}
 
-Kelly McCaskey\symbolfootnote[2]{Kelly McCaskey is a Ph.D. student in the Department of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:kellymccaskey@tamu.edu}{kellymccaskey@tamu.edu}).}
+Carlisle Rainey\symbolfootnote[3]{Carlisle Rainey is Assistant Professor of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:crainey@tamu.edu}{crainey@tamu.edu}).}
 
 \vspace{3mm}
 
-Carlisle Rainey\symbolfootnote[3]{Carlisle Rainey is Assistant Professor of Political Science, Texas A\&M University, 2010 Allen Building, College Station, TX, 77843 (\href{mailto:crainey@tamu.edu}{crainey@tamu.edu}).}
+Kelly McCaskey\symbolfootnote[2]{Kelly McCaskey is Operations Analyst at Accruent, 11500 Alterra Parkway, \#110, Austin, TX, 78758 (\href{mailto:kmccaskey@accruent.com}{kmccaskey@accruent.com}).}
+
 \end{center}
 
 \vspace{10mm}
@@ -78,7 +79,8 @@ Carlisle Rainey\symbolfootnote[3]{Carlisle Rainey is Assistant Professor of Poli
 {\centerline{\textbf{Abstract}}}
 \begin{quote}\noindent
 In small samples, maximum likelihood (ML) estimates of logit model coefficients have substantial bias away from zero.
-As a solution, we introduce political scientists to Firth's (1993) penalized maximum likelihood (PML) estimator.
+As a solution, we remind political scientists of Firth's (1993) penalized maximum likelihood (PML) estimator. 
+Prior research has described and used PML, especially in the context of separation, but its small sample properties remain under-appreciated.
 The PML estimator eliminates most of the bias and, perhaps more importantly, greatly reduces the variance of the usual ML estimator.
 Thus, researchers do not face a bias-variance tradeoff when choosing between the ML and PML estimators--the PML estimator has a smaller bias \textit{and} a smaller variance.
 We use Monte Carlo simulations and a re-analysis of \cite{GeorgeEpstein1992} to show that the PML estimator offers a substantial improvement in small samples (e.g., 50 observations) and noticeable improvement even in larger samples (e.g., 1,000 observations).
@@ -101,11 +103,11 @@ We use Monte Carlo simulations and a re-analysis of \cite{GeorgeEpstein1992} to 
 Logit and probit models have become a staple in quantitative political and social science--nearly as common as linear regression \citep{KruegerLewisBeck2008}. 
 And while the usual maximum likelihood (ML) estimates of logit and probit model coefficients have excellent large-sample properties, these estimates behave quite poorly in small samples. 
 Because the researcher cannot always collect more data, this raises an important question: How can a researcher obtain reasonable estimates of logit and probit model coefficients using only a small sample?
-
-In this paper, we introduce political scientists to Firth's (\citeyear{Firth1993}) penalized maximum likelihood (PML) estimator, which greatly reduces the small-sample bias of ML estimates of logit model coefficients. 
+In this paper, we remind political scientists that Firth's (\citeyear{Firth1993}) penalized maximum likelihood (PML) estimator greatly reduces the small-sample bias of ML estimates of logit model coefficients. 
 We show that the PML estimator nearly eliminates the bias, which can be substantial. 
 But even more importantly, the PML estimator dramatically reduces the variance of the ML estimator. 
 Of course, the inflated bias and variance of the ML estimator lead to a larger overall mean-squared error (MSE). 
+Using an example from published research \citep{GeorgeEpstein1992}, we illustrate the differences in the ML and PML estimators.
 Moreover, we offer Monte Carlo evidence that evidence that the PML estimator offers a substantial improvement in small samples (e.g., 100 observations) and noticeable improvement even in large samples (e.g., 1,000 observations).
 
 \section*{The Big Problem with Small Samples}
@@ -127,7 +129,7 @@ To develop the ML estimator of the logit model, we can derive the likelihood fun
 \begin{equation}\nonumber
 \log L(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left(1- \dfrac{1}{1 + e^{-X_i\beta}}\right)\right].
 \end{equation}
-\noindent The researcher can obtain the ML estimate $\hat{\beta}^{mle}$ by finding the vector $\beta$ that maximizes $\log L$ given $y$ and $X$ \citep{King1989}.
+\noindent The researcher can obtain the ML estimate $\hat{\beta}^{mle}$ by finding the vector $\beta$ that maximizes $\log L$ given $y$ and $X$ \citep{King1989}.\footnote{In practice, we use iteratively reweighted least squares to use ML to fit logit models in this paper, the default behavior of \texttt{glm()} in R.}
 
 The ML estimator has excellent properties in large samples. It is asymptotically unbiased, so that $E(\hat{\beta}^{mle}) \approx \beta^{true}$ when the sample is large (\citealt{Wooldridge2002}, pp. 391-395, and \citealt{CasellaBerger2002}, p. 470). 
 It is also asymptotically efficient, so that the asymptotic variance of the ML estimate obtains the Cramer-Rao lower bound (\citealt{Greene2012}, pp. 513-523, and \citealt{CasellaBerger2002}, pp. 472, 516). 
@@ -147,12 +149,16 @@ We take the natural logarithm of both sides to obtain the \textit{penalized} log
 \log L^*(\beta | y) = \displaystyle \sum_{i = 1}^n \left[y_i \log \left( \dfrac{1}{1 + e^{-X_i\beta}}\right) + (1 - y_i) \log \left(1 - \dfrac{1}{1 + e^{-X_i\beta}}\right)\right] + \dfrac{1}{2} \log |I(\beta)|.
 \end{equation}
 Then the researcher can find the penalized maximum likelihood (PML) estimate $\hat{\beta}^{pmle}$ by finding the vector $\beta$ that maximizes $\log L^*$.
+\footnote{For details on numerical optimization of the log-likelihood and penalized log-likelihood functions, we refer readers to an especially clear discussion in \citet[ch. 5]{Gill2000} and the references therein and \citet[p. 799]{KosmidisFirth2009}.}$^,$\footnote{On might also consider least squares (LS) in the context of small samples, even with a binary outcome. Indeed, in testing the null hypotheses that an explanatory variable has no effect, LS and PML (with profile likelihood tests) perform nearly identically. However, for a variety of reasons, researchers might like to obtain approximately unbiased estimates of logit coefficients. We take this assumption as a starting point of our paper. Depending on the data, the correct model, and quantity of interest, LS might offer a reasonable or terrible alternative to a logit model estimated with ML. For example, LS does a reasonable job of estimating the average marginal effect (across all observations), but a horrible job of estimating risk ratios. Given that substantive political scientists are increasingly critical of analyses that focus exclusively on $p$-values \citep{KingTomzWittenberg2000, Rainey2014a, Gross2015, McCaskeyRainey2015}, we view LS only as a non-default choice that only works well in special cases.}
 
 \cite{Zorn2005} suggests PML for solving the problem of separation,
 % (see also \citealt{Rainey-separation})
-but the broader and more important application to small sample problems seems to remain unnoticed in political science.\footnote{Though we are aware of many published papers that use PML to address the problem of separation (e.g., \citealt{BellMiller2015}; \citealt{ViningWilhelmCollens2015}; \citealt{LeemanMares2014}; and \citealt{BarrilleauxRainey2014}), we are aware of no published work in political science using PML for bias reduction. 
-We are aware of three \textit{unpublished} papers using PML for bias reduction: \cite{KaplowGartzke2015} use PML to estimate a logit model with a rare outcome, \cite{Betz2015b} uses PML to estimate a Poisson regression model, and \cite{Betz2015a} uses PML to estimate a beta regression model with observations at the boundary.} 
-While \cite{HeinzeSchemper2002} and \cite{Zorn2005} recommend using a profile likelihood confidence interval when using PML to address separation, this approach does not usually offer a noticeable improvement when using PML to only address a small-sample bias.\footnote{However, the R package \texttt{logistf} \citep{logistf} that we illustrate in the appendix computes the profile likelihood confidence interval automatically.}
+but the broader and more important application to small sample problems seems to remain under-appreciated in political science.\footnote{\cite{KingZeng2001}, \cite{Zorn2005}, and \cite{Rainey-separation} each mention, but do not focus on, the small-sample properties of PML. Though we are aware of many published papers that use PML to address the problem of separation (e.g., \citealt{BellMiller2015}; \citealt{ViningWilhelmCollens2015}; \citealt{LeemanMares2014}; and \citealt{BarrilleauxRainey2014}), and one published paper \citep{ChachaPowell2016} and one unpublished paper \citep{KaplowGartzke2015} that use PML to address the related problem of rare events \citep{KingZeng2001}, we are aware of no published work in political science using PML for bias reduction specifically in small samples in logit models. 
+We are aware of two \textit{unpublished} papers using PML for bias reduction: \cite{Betz2015b} uses PML to estimate a Poisson regression model and \cite{Betz2015a} uses PML to estimate a beta regression model with observations at the boundary.} 
+Most importantly, though, we show that the small-sample \textit{bias} should be of secondary concern to the small-sample \textit{variance} of ML. 
+Fortunately, PML reduces both the bias and the variance of the ML estimates of logit model coefficients.
+
+%While \cite{HeinzeSchemper2002} and \cite{Zorn2005} recommend using a profile likelihood confidence interval when using PML to address separation, this approach does not usually offer a noticeable improvement when using PML to only address a small-sample bias.\footnote{However, the R package \texttt{logistf} \citep{logistf} that we illustrate in the appendix computes the profile likelihood confidence interval automatically.}
 
 A researcher can implement PML as easily as ML, but PML estimates of logit model coefficients have a smaller bias \citep{Firth1993} and a smaller variance (\citealt[p. 49]{Kosmidis2007}, and \citealt{Copas1988}).\footnote{The penalized maximum likelihood estimates are easy to calculate in R using the \texttt{logistf} \citep{logistf} or \texttt{brglm} \citep{brglm} packages and in Stata with the \texttt{firthlogit} \citep{firthlogit} module. 
 See the Section \ref{sec:pmle-in-R} and Section \ref{sec:pmle-in-stata} of the Appendix, respectively, for examples.}
@@ -167,16 +173,29 @@ Now suppose a quadratic loss function for the logit model coefficients, such tha
 In this case, the inequality holds strictly for all $\beta^{true}$ so that $R^{pmle} < R^{mle}$. For logit models, then, we can describe the ML estimator as \textit{inadmissible} and say that the PML estimator \textit{dominates} the ML estimator.
 
 The intuition of the bias reduction is subtle. 
-First, consider the source of the bias.
+First, consider the source of the bias, illustrated in Figure \ref{fig:illustrate}.
 Calculate the score function $s$ as the gradient (or first-derivative) of the log-likelihood with respect to $\beta$ so that $s(y, \beta) = \nabla \log L(\beta | y)$. 
 Note that solving $s(y, \hat{\beta}^{mle}) = 0$ is equivalent to finding $\hat{\beta}^{mle}$ that maximizes $\log L(\beta | y)$. 
 Now recall that at the true parameter vector $\beta^{true}$, the expected value of the score function is zero so that $E\left[ s(y, \beta^{true})\right] = 0$ \citep[p. 517]{Greene2012}.
-This implies that $E\left[ s(y, \beta^{true}) | s(y, \beta^{true}) > 0 \right] =  -E\left[ s(y, \beta^{true}) | s(y, \beta^{true}) < 0 \right]$. 
-This means that high misses $s(y, \beta^{true}) > 0$ and low misses $s(y, \beta^{true}) < 0$ cancel exactly.
-However, if the score function $s$ is decreasing and curved in the area around $\beta^{true}_j$ so that $s''_j = \frac{\partial^2 s(y, \beta)}{\partial^2 \beta_j} > 0$, then a high miss $s(y, \beta^{true}) > 0$ implies an estimate well above the true value, so that $\hat{\beta}^{mle} >> \beta^{true}$, and a low miss $s(y, \beta^{true}) < 0$ implies an estimate only slightly below the true value, so that $\hat{\beta}^{mle} < \beta^{true}$.
+By the law of total probability, this implies that 
+\begin{equation}\label{eqn:cancel}
+E\left[ s(y, \beta^{true}) | s(y, \beta^{true}) > 0 \right] =  -E\left[ s(y, \beta^{true}) | s(y, \beta^{true}) < 0 \right],  
+\end{equation}
+which is highlighted by (i) in Figure \ref{fig:illustrate}.
+
+However, if the score function $s$ is decreasing and curved in the area around $\beta^{true}_j$ so that $s''_j = \frac{\partial^2 s(y, \beta)}{\partial^2 \beta_j} > 0$ (see Figure \ref{fig:illustrate}), then a high miss $s(y, \beta^{true}) > 0$ (top dashed line in Figure \ref{fig:illustrate}) implies an estimate well above the true value, so that $\hat{\beta}^{mle} >> \beta^{true}$, and a low miss (bottom dashed line in Figure \ref{fig:illustrate}) $s(y, \beta^{true}) < 0$ implies an estimate only slightly below the true value, so that $\hat{\beta}^{mle} < \beta^{true}$.
+In effect, the curved (convex) score function pulls low misses closer the true value and pushes high misses even further from the true value.
+This dynamic, which is highlighted by (ii) in Figure \ref{fig:illustrate}, implies that low misses and high misses do not cancel and that the ML estimate is too large on average.
 A similar logic applies for $s''_j < 0$. 
 Therefore, due to the curvature in the score function $s$, the high and low misses of $\hat{\beta}^{mle}$ do not cancel out, so that $E(\hat{\beta}^{mle}_j) > \beta^{true}_j$ when $s''_j > 0$ and $E(\hat{\beta}^{mle}) < \beta^{true}_j$ when $s''_j < 0$.
 \citet[pp. 251-252]{CoxSnell1968} derive a formal statement of this bias of order $n^{-1}$, which we denote as $\text{bias}_{n^{-1}}(\beta^{true})$. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale = .4]{figs/illustrate-bias-annotated.pdf}
+\caption{This figure illustrates the source of the bias using the score functions for two hypothetical samples shown with dashed lines. Notice that, when evaluated at $\beta^{true}$, the score functions cancel on average (Equation \ref{eqn:cancel}). However, the nonlinearity of the score function pushes the ML estimate of the high miss (top line) relatively futher from the true value. On the other hand, the nonlinearity of the score function pulls the ML estimate of the low miss (bottom line) relatively closer.}\label{fig:illustrate}
+\end{center}
+\end{figure}
 
 Now consider the bias reduction strategy. 
 At first glance, one may simply decide to subtract $\text{bias}_{n^{-1}}(\beta^{true})$ from the estimate $\hat{\beta}^{mle}$. 
@@ -383,7 +402,12 @@ Here though, we present the PML estimator as an alternative, so we have room to 
 
 On the grounds that the PML estimator dominates the ML estimator, we might recommend that researchers always use the PML estimator. 
 But we do not want or expect researchers to switch from the common and well-understood ML estimator to the PML estimator without a clear, meaningful improvement in the estimates. 
-We use a Monte Carlo simulation to develop rules of thumb that link the amount of information in the data set to the cost of using ML rather than PML. 
+While the PML estimator is theoretically superior, it includes practical costs. 
+Indeed, even though the R packages \texttt{brglm} \citep{brglm}, \texttt{brglm2} \citep{Kosmidis:2017aa}, and \texttt{logistf} \citep{Heinze:2016aa} and the Stata module \texttt{FIRTHLOGIT} \citep{firthlogit} make fitting these models quick and easy, this approach might require researchers to write custom software to compute quantities of interest. 
+Further, the theory behind the approach is less familiar to most researchers and their readers. 
+Finally, these models are much more computationally demanding.
+While the computational demands of a single PML fit are trivial, this costs might become prohibitive for procedures requiring many fits, such as bootstrap or Monte Carlo simulations.
+With these practical costs in mind, we use a Monte Carlo simulation to develop rules of thumb that link the amount of information in the data set to the cost of using ML rather than PML. 
 
 We measure the cost of using ML rather than PML as the MSE inflation defined in Equation \ref{eqn:mse-infl}: the percent increase in the MSE when using ML rather than PML. 
 The MSE inflation summarizes the relative inaccuracy of the ML estimator compared to the PML estimator.
@@ -406,6 +430,7 @@ We use the following cutoffs.
 \end{enumerate}
 
 To develop our recommendations, we estimate the MSE inflation for a wide range of hypothetical analyses across which the true coefficients, the number of explanatory variables, and the sample size varies. 
+
 To create each hypothetical analysis, we do the following:
 \begin{enumerate}
 \item Choose the number of covariates $k$ randomly from a uniform distribution from 3 to 12.
@@ -414,10 +439,12 @@ To create each hypothetical analysis, we do the following:
 \item Choose the slope coefficients $\beta_1,...,\beta_k$ randomly from a normal distribution with mean 0 and standard deviation 0.5.
 \item Choose a covariance matrix $\Sigma$ for the explanatory variables randomly using the method developed by \cite{Joe2006} such that the variances along the diagonal range from from 0.25 to 2.
 \item Choose the explanatory variables $x_1, x_2,...,x_k$ randomly from a multivariate normal distribution with mean 0 and covariance matrix $\Sigma$. 
+\item If these choices produce a data set with less than 20\% events or non-events, then we discard this analysis.
 \end{enumerate}
-Note that our rules of thumb do not apply to rare events data \citep{KingZeng2001}.
-By the design of our simulation study, our guidelines apply to events more common than 2\% and less common than 98\%.
-However, researchers using rare events data should view our recommendations as conservative; as the sample size increases, the MSE tends to shrink relative to $\xi$. 
+Note that researchers should not apply our rules of thumb to rare events data \citep{KingZeng2001}, because they are overly conservative.
+As the sample size increases, the MSE inflation drops, even if $\xi$ is held constant. 
+By the design of our simulation study, our guidelines apply to events more common than 20\% and less common than 80\%.
+However, researchers using rare events data should view our recommendations as conservative; as the sample size increases, the MSE tends to shrink relative to $\xi$.\footnote{A more complicated, but precise, set of rules might rely on sample size and $\xi$, but then they are no longer rules of thumb and fail to provide \textit{simple} guidelines.}
 
 For each hypothetical analysis, we simulate 2,000 data sets and compute the MSE inflation of the ML estimator relative to the PML estimator using Equation \ref{eqn:mse-infl}.
 We then use quantile regression to model the 90th percentile as a function of the information $\xi$ in the data set.
@@ -427,12 +454,17 @@ We then calculate the thresholds at which the MSE inflation probably falls below
 Interestingly, ML requires more information to estimate the intercept $\beta_{cons}$ accurately relative to PML than the slope coefficients $\beta_1,..., \beta_k$ (see \citealt{KingZeng2001}).
 Because of this, we calculate the cutoffs separately for the intercept and slope coefficients.
 
-If the researcher simply wants accurate estimates of the slope coefficients, then she risks substantial costs when using ML with $\xi \leq 12$ and noticeable costs when using ML with $\xi \leq 51$. If the researcher also wants an accurate estimate of the intercept, then she risks substantial costs when using ML with $\xi \leq 33$ and noticeable costs when using ML when $\xi \leq 96$. 
+If the researcher simply wants accurate estimates of the slope coefficients, then she risks substantial costs when using ML with $\xi \leq 16$ and noticeable costs when using ML with $\xi \leq 57$. If the researcher also wants an accurate estimate of the intercept, then she risks substantial costs when using ML with $\xi \leq 35$ and noticeable costs when using ML when $\xi \leq 92$. 
+Researchers should treat these thresholds as rough rules of thumb--not strict guidelines.
+Indeed, the MSE inflation depends on a complex interaction of many features of the analysis, including the number of covariates, their distribution, the magnitude of their effects, the correlation among them, and the sample size. 
+However, these (rough) rules accomplish two goals.
+First, they provide researchers with a rough idea of when the choice of estimator might matter.
+Second, they highlight that analysis with samples typically considered ``large enough'' for ML might benefit from using PML instead.
 
-Importantly, the cost of ML only becomes negligible for all model coefficients when $\xi > 96$--this threshold diverges quite a bit from the prior rules of thumb.
+Importantly, the cost of ML only becomes negligible for all model coefficients when $\xi > 92$--this threshold diverges quite a bit from the prior rules of thumb.
 For simplicity, assume the researcher wants to include eight explanatory variables in her model.
-In the best case scenario of 50\% events, she should definitely use the PML estimator with fewer than $\frac{8 \times 12}{0.5} = 192$ observations and ideally use the PML estimator with fewer than $\frac{8 \times 51}{0.5} = 816$ observations.  
-But if she would also like accurate estimates of the intercept, then these thresholds increase to $\frac{8 \times 33}{0.5} = 528$ and $\frac{8 \times 96}{0.5} = 1,536$ observations. 
+In the best case scenario of 50\% events, she should definitely use the PML estimator with fewer than $\frac{8 \times 16}{0.5} = 256$ observations and ideally use the PML estimator with fewer than $\frac{8 \times 57}{0.5} = 912$ observations.  
+But if she would also like accurate estimates of the intercept, then these thresholds increase to $\frac{8 \times 35}{0.5} = 560$ and $\frac{8 \times 92}{0.5} = 1,472$ observations. 
 Many logit and probit models estimated using survey data have fewer than 1,500 observations and these studies risk a noticeable cost by using the ML estimator rather than the PML estimator.
 Further, these estimates assume 50\% events. 
 As the number of events drifts toward 0\% or 100\% or the number of variables increases, then the researcher needs even more observations.
@@ -441,10 +473,10 @@ As the number of events drifts toward 0\% or 100\% or the number of variables in
 \centering
 \begin{tabular}{ccc}
 \hline
-Acceptable Inaccuracy   &  Slopes Coefficients     & Intercept        \\ \hline
-Substantial & $\xi < 12$         & $\xi < 33$          \\
-Noticeable  & $12 \leq \xi < 51$ & $33 \leq \xi < 96$ \\
-Negligible  & $\xi \geq 51$        & $\xi \geq 96$        
+Acceptable Inaccuracy   &  Slope Coefficients     & Intercept        \\ \hline
+Substantial & $\xi < 16$         & $\xi < 35$          \\
+Noticeable  & $16 \leq \xi < 57$ & $35 \leq \xi < 92$ \\
+Negligible  & $\xi \geq 57$        & $\xi \geq 92$        
 \end{tabular}
 \caption{This table shows the thresholds at which the cost of ML relative to PML becomes substantial, noticeable, and negligible when estimating the slope coefficients and the intercept.}\label{tbl:thresholds}
 \end{table}
@@ -499,15 +531,14 @@ Whenever researchers have concerns about bias and variance due to a small sample
 
 \section{PML Estimation in R}\label{sec:pmle-in-R}
 
-This example code is available at \href{https://github.com/kellymccaskey/small/blob/master/R/example.R}{https://github.com/kellymccaskey/small/blob/master/R/example.R}.
+This example code is available at [redacted].
 
 \begin{footnotesize}
 \begin{verbatim}
 
 # load data from web
 library(readr)  # for read_csv()
-weisiger <- read_csv("https://raw.githubusercontent.com/kellymccaskey/small/master/weisiger-
-	replication/data/weisiger.csv")
+weisiger <- read_csv([redacted])
 
 # quick look at data
 library(dplyr)  # for glimpse()
@@ -556,15 +587,15 @@ help(brglm)
 
 \section{PML Estimation in Stata}\label{sec:pmle-in-stata}
 
-This example code is available at \href{https://github.com/kellymccaskey/small/blob/master/stata/example.do}{https://github.com/kellymccaskey/small/blob/master/stata/example.do}.
+This example code is available at [redacted].%\href{https://github.com/kellymccaskey/small/blob/master/stata/example.do}{https://github.com/kellymccaskey/small/blob/master/stata/example.do}.
 
-\noindent The example data used is available at \href{https://github.com/kellymccaskey/small/blob/master/stata/GE.dta}{https://github.com/kellymccaskey/small/blob/master/stata/ge.csv}.
+\noindent The example data used is available at [redacted].%\href{https://github.com/kellymccaskey/small/blob/master/stata/GE.dta}{https://github.com/kellymccaskey/small/blob/master/stata/ge.csv}.
 
 
 \begin{footnotesize}
 \begin{verbatim}
 * set working directory and load data
-* data can be found at https://github.com/kellymccaskey/small/blob/master/stata/ge.csv
+* data can be found at [redacted] 
 cd "your working directory"
 insheet using "ge.csv", clear
 
