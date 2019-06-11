@@ -1,4 +1,4 @@
-library(ggplot2)
+library(tidyverse) 
 library(scales)
 library(quantreg)
 library(gridExtra)
@@ -6,7 +6,7 @@ library(xtable)
 library(doParallel)
 
 
-df <- readRDS("R/simulations/sample-size-simulations.RData")
+df <- read_rds("simulations/sample-size-simulations.rds")
 df <- df[df$sep == 0, ]
 
 base_breaks <- function(n = 3, include = NULL) {
@@ -25,7 +25,7 @@ new_df
 
 
 gg <- ggplot(subset(df, par_type == "Slope Coefficient"), aes(x = info, y = mse_infl/100)) + 
-  geom_point(aes(size = n, color = true_value), shape = 1, alpha = 1.0, solid = FALSE) +
+  geom_point(aes(size = n, color = true_value), shape = 1, alpha = 1.0) +
   geom_quantile(quantiles = c(0.9), color = "black") +
   scale_color_gradient2(high = "#7570b3",
                         mid = "grey70",
@@ -134,3 +134,4 @@ colnames(new_mat) <- c("$xi$",
                     "MSE-Inflation for Intercept")
 xtab <- xtable(new_mat, digits = c(0, 0, 1, 1))
 print(xtab, include.rownames=FALSE)
+

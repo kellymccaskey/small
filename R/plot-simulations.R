@@ -1,19 +1,24 @@
 
+# load packages
+library(tidyverse)
+library(scales)
+library(gridExtra)
+
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
 
 # read data
-sims <- read.csv("R/simulations/sims.csv", stringsAsFactors = FALSE)
+sims <- read_rds("simulations/simulations.rds")
 
 # create table of simulation estimates of bias and variance
-sims_table <- dplyr::select(sims, n, k, b0, method, bias, var)
+sims_table <- select(sims, n, k, b0, method, bias, var)
 rownames(sims_table) <- 1:nrow(sims_table)
 filter(sims_table, n == 60 & k == 6 & b0 == 0.0)
 
-s1 <- spread(dplyr::select(sims_table, n, k, b0, method, bias), method, bias)
+s1 <- spread(select(sims_table, n, k, b0, method, bias), method, bias)
 colnames(s1)[4:5] <- c("ml_bias", "pml_bias")
-s2 <- spread(dplyr::select(sims_table, n, k, b0, method, var), method, var)
+s2 <- spread(select(sims_table, n, k, b0, method, var), method, var)
 colnames(s2)[4:5] <- c("ml_var", "pml_var")
 
 # scatterplot of mean and var contributions
@@ -39,7 +44,7 @@ gg1 <- ggplot(sims_wide, aes(x = var_contrib,
        color = "Intercept",
        size = "Sample Size",
        shape = "Number of Variables") +
-  theme
+  theme_bw()
 ggsave("manuscript/figs/contrib-bias-var-scatter.pdf", gg1,  width = 8, height = 5)
 
 # scatter plot of relative contributions and sample size
@@ -59,7 +64,7 @@ gg2 <- ggplot(sims_wide, aes(x = n,
        y = "Relative Contribution of Variance Compared to Bias",
        color = "Intercept",
        shape = "Number of Variables") +
-  theme
+  theme_bw()
 ggsave("manuscript/figs/relcontrib-n-scatter.pdf", gg2, width = 8, height = 5)
 
 # combine the two previous plots
@@ -76,7 +81,7 @@ sims <- mutate(sims, b0_factor = reorder(b0_factor, prop_ones))
 cat("\n\nmaking and saving plots...\n\n")
 gg <- ggplot(sims, aes(x = n, color = method, linetype = method)) + 
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
-  theme + 
+  theme_bw() + 
 	scale_color_manual(values = c("#7570b3", "#d95f02")) +
 	labs(x = "Sample Size", 
   		 color = "Method", linetype = "Method")
@@ -113,14 +118,14 @@ gg + geom_line(aes(y = mse), size = 1.1) +
 ggsave("manuscript/figs/sims-mse.pdf", width = 8, height = 5)
 
 # variance inflation
-var_df <- dplyr::select(sims, n, k_factor, b0_factor, var, method)
+var_df <- select(sims, n, k_factor, b0_factor, var, method)
 var_infl_df <- spread(var_df, method, var)
 var_infl_df <- mutate(var_infl_df, var_infl = (ML/PML - 1))
 ggplot(var_infl_df, aes(x = n, y = var_infl), size = 1.1) + 
   geom_line(size = 1.1) +
   scale_y_continuous(labels = percent) + 
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
-  theme +
+  theme_bw() +
 	scale_color_manual(values = c("#998ec3", "#f1a340")) +
 	labs(x = "Sample Size") +
   labs(y = "Variance Inflation") +
@@ -128,13 +133,13 @@ ggplot(var_infl_df, aes(x = n, y = var_infl), size = 1.1) +
 ggsave("manuscript/figs/sims-var-infl.pdf", width = 8, height = 5)
 
 # mse inflation
-mse_df <- dplyr::select(sims, n, k_factor, b0_factor, mse, method)
+mse_df <- select(sims, n, k_factor, b0_factor, mse, method)
 mse_infl_df <- spread(mse_df, method, mse)
 mse_infl_df <- mutate(mse_infl_df, mse_infl = (ML/PML - 1))
 ggplot(mse_infl_df, aes(x = n, y = mse_infl), size = 1.1) + 
   geom_line(size = 1.1) +
   facet_grid(k_factor ~ b0_factor, labeller = "label_parsed") +
-  theme +
+  theme_bw() +
   scale_y_log10(limits = c(0.01, 10), 
                 breaks = c(0.01, 0.1, 1, 10),
                 minor_breaks = NULL,

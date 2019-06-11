@@ -1,7 +1,22 @@
 
+# load packages
+library(MASS)
+library(tidyverse)
+library(brglm)
+library(scoring)
+library(texreg)
+library(separation)
+library(grid)
+
+# set seed
+# > runif(1)
+# [1] 0.760381
+set.seed(760381)
+
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
+theme <- theme_bw()
 
 # load data
 ge <- read_csv("ge-replication/data/ge.csv")
@@ -63,9 +78,6 @@ tidy_models <- function(model_list, model_names) {
   return(df)
 }
 
-# tidy model output
-models_df <- tidy_models(list(mle, pmle), c("ML", "PML"))
-
 # add variable names for printing
 vnp <- c("Intercept",
          "Death-Qualified Jury",
@@ -79,9 +91,12 @@ vnp <- c("Intercept",
          "Inexperienced Defense Counsel",
          "Repeat Player State",
          "Amicus Brief from Solicitor General")
-models_df <- mutate(models_df, var_name_print = rep(vnp, 2))
-models_df <- mutate(models_df, var_name_print = factor(var_name_print, 
-                                                       levels = vnp))
+
+# tidy model output
+models_df <- tidy_models(list(mle, pmle), c("ML", "PML")) %>%
+  mutate(var_name_print = factor(rep(vnp, 2),  levels = vnp)) %>%
+  write_rds("ge-replication/coefficient-estimates.rds") %>%
+  glimpse()
 
 # plot coefficients
 gg <- ggplot(subset(models_df, var_name_print != "Intercept"), 
@@ -193,7 +208,8 @@ print(out_sample_fit)
 method <- c("ML", "ML", "PML", "PML")
 score_type <- c("Brier Score", "Log Score", "Brier Score", "Log Score")
 score <- c(mean(brier_mle), mean(log_mle), mean(brier_pmle), mean(log_pmle))
-osf_df <- data_frame(method, score_type, score)
+osf_df <- data_frame(method, score_type, score) %>%
+  write_rds("ge-replication/out-of-sample-fit.rds")
 gg <- ggplot(osf_df, aes(x = score_type, y = score, fill = method)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   labs(title = "Out-of-Sample Prediction Scores") + 
@@ -255,7 +271,8 @@ prob <- c(with(qi_mle_est, p_hi_est),
           with(qi_mle_est, p_lo_est),
           with(qi_pmle_est, p_hi_est),
           with(qi_pmle_est, p_lo_est))
-prob_df <- data_frame(method, st, prob)
+prob_df <- data_frame(method, st, prob) %>%
+  write_rds("ge-replication/qi-probs.rds")
 cat("\npredicted probabilities\n")
 print(as.data.frame(prob_df))
 
@@ -289,7 +306,8 @@ lwr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .05)),
             with(qi_pmle_sims, quantile(fd_sims, .05)))
 upr_90 <- c(with(qi_mle_sims, quantile(fd_sims, .95)),
             with(qi_pmle_sims, quantile(fd_sims, .95)))
-fd_df <- data_frame(method, est, lwr_90, upr_90)
+fd_df <- data_frame(method, est, lwr_90, upr_90) %>%
+  write_rds("ge-replication/qi-fd.rds")
 cat("\nfirst differences\n")
 print(as.data.frame(fd_df))
 
@@ -320,7 +338,8 @@ lwr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .05)),
             with(qi_pmle_sims, quantile(rr_sims, .05)))
 upr_90 <- c(with(qi_mle_sims, quantile(rr_sims, .95)),
             with(qi_pmle_sims, quantile(rr_sims, .95)))
-rr_df <- data_frame(method, est, lwr_90, upr_90)
+rr_df <- data_frame(method, est, lwr_90, upr_90)  %>%
+  write_rds("ge-replication/qi-rr.rds")
 cat("\nrisk ratios\n")
 print(as.data.frame(rr_df))
 

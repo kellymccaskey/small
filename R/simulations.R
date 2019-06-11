@@ -1,3 +1,17 @@
+# load packages
+library(tidyverse)
+library(brglm2)
+library(logistf)
+library(foreach)
+library(doParallel)
+library(doRNG)
+library(MASS)
+
+# set seed
+# > runif(1)
+# [1] 0.760381
+set.seed(760381)
+
 
 # function to perform simulations
 simulate <- function(n, k, b0, b1) {
@@ -82,34 +96,36 @@ b0 <- c(-1, -0.5, 0) #seq(-1, 0, by = 0.1)
 # set values of coefficient of interest
 b1 <- 0.5
 
+par_df <- crossing(k, n, b0, b1) %>%
+  mutate(scenario_id = 1:n()) %>%
+  glimpse()
+
 # number of mc simulations
-n.sims <- 50000
+n.sims <- 100000
 
 # create holder for simulations
 sims <- NULL
 
 # do simulations
-total_iter <- length(b0)*length(k)*length(n)
-iter <- 0
-pb <- txtProgressBar(min = 0, max = total_iter, style = 3)
-for (m in 1:length(b0)) {  # loop over intercepts
-  #cat(paste("-- b0 = ", b0[m], "\n"))  # report intercept
-  for (j in 1:length(k)) {  # loop over number of variables 
-    #cat(paste("---- k = ", k[j], "\n"))  # report number of variables
-    for (i in 1:length(n)) {  # loop over sample sizes
-      #cat(paste("------ n = ", n[i], "\n"))  # report sample sizes
-      sims0 <- simulate(n[i], k[j], b0[m], b1)  # simulate for given parameters
-      sims <- rbind(sims, sims0)  # combine with previous data
-      #cat("\n")  # new line
-      iter <- iter + 1
-      setTxtProgressBar(pb, iter)
-    }
-  }
+if (file.exists("simulations-progress.log")) file.remove("simulations-progress.log")
+cl <- makeCluster(detectCores(), outfile = "simulations-progress.log")
+registerDoParallel(cl)
+start_time <- Sys.time()
+sims <- foreach (i = par_df$scenario_id, .combine = rbind, 
+                 .packages = c("tidyverse", "brglm", "logistf", "MASS")) %dorng% {  # loop over sample sizes
+  par_df_i <- par_df %>%
+    filter(scenario_id == i)
+  time_working <- difftime(Sys.time(), start_time, units = "auto")
+  cat(paste0("\nStarting Scenario ",  i, " of ", 
+             max(par_df$scenario_id), " after ", 
+             round(time_working[[1]]),  " ", units(time_working), " of working...."))
+  simulate(par_df_i$n, par_df_i$k, par_df_i$b0, par_df_i$b1)  # simulate for given parameters
 }
+stopCluster(cl)
 
 # fix rownames
 rownames(sims) <- 1:nrow(sims)
 
 # write data
-cat("\n\nsaving simulations to R/simulations/sims.csv...\n\n")
-write_csv(sims, "R/simulations/sims.csv")
+cat("\n\nsaving simulations to simulations/simulations.rds...\n\n")
+write_rds(sims, "simulations/simulations.rds")

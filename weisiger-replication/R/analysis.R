@@ -1,7 +1,23 @@
 
+# load packages
+library(MASS)
+library(tidyverse)
+library(brglm)
+library(texreg)
+library(scoring)
+library(grid)
+library(gridExtra)
+library(separation)
+
+# set seed
+# > runif(1)
+# [1] 0.760381
+set.seed(760381)
+
 # plot parameters
 ann_size <- 3
 ann_color <- "grey50"
+theme <- theme_bw()
 
 # --------------- #
 # estimate models #
@@ -83,7 +99,7 @@ gg <- ggplot(models_df, aes(var_name_print, est,
 														ymax = upr_90,
 														color = model_name,
 														linetype = model_name)) + 
-	geom_pointrange(width = 0, position = position_dodge(width = 0.6), size = 0.7) +
+	geom_pointrange(position = position_dodge(width = 0.6), size = 0.7) +
 	coord_flip() + 
 	labs(title = "Logistic Regression Model Explaining\nPost-Conflict Guerrilla War") + 
 	labs(y = "Logistic Regression Coefficients and 90% Confidence Intervals\n(Variables Standardized)") + 

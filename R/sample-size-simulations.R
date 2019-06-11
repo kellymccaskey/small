@@ -1,13 +1,20 @@
 
-rm(list = ls())
-
-library(clusterGeneration)
-library(brglm)
+# load packages
+library(tidyverse)
+library(brglm2)
+library(foreach)
 library(doParallel)
+library(doRNG)
+
+# set seed
+# > runif(1)
+# [1] 0.760381
+set.seed(760381)
+
 
 simulate_pars <- function() {
-  k <- round(runif(1, 3, 12))  # number of covariates
-  n <- round(runif(1, 200, 3000))  # number of observations
+  k <- floor(runif(1, 3, 13))  # number of covariates
+  n <- floor(runif(1, 200, 3001))  # number of observations
   b_cons <- runif(1, -4, 4)  # value of the interecept
   b <- rnorm(k, sd = 0.5)  # value of the other coefficients
   beta <- c(b_cons, b)  # combine intercept with other coefficients
@@ -22,7 +29,6 @@ simulate_pars <- function() {
               Xbeta = Xbeta)
   return(res)
   }
-pars <- simulate_pars()
 
 generate_data_and_est <- function(pars) {
   p <- plogis(pars$Xbeta)
@@ -81,22 +87,23 @@ simulate <- function(n_sims) {
 	return(df)
 } 
 
-cl <- makeCluster(4)
+if (file.exists("sample-size-simulations-progress.log")) file.remove("sample-size-simulations-progress.log")
+cl <- makeCluster(detectCores(), outfile = "sample-size-simulations-progress.log")
 registerDoParallel(cl)
-getDoParWorkers()
-getDoParRegistered()
-system.time({
-  n_dgps <- 500
-  write("", file = "output.txt")  # clear log file
-  df <- foreach (i = 1:n_dgps, 
-                 .combine = rbind, 
-                 .packages = c("clusterGeneration", "brglm")) %dopar% {
-                   write(paste("Working on DGP ", i, " of ", n_dgps, ". Random draw is ", runif(1), ".", sep = ""), file = "output.txt", append = TRUE)
-                   simulate(n_sims = 2000)
-                   
-                 }
-  stopCluster(cl)
-})
+start_time <- Sys.time()
+n_dgps <- 1000
+df <- foreach (i = 1:n_dgps, 
+               .combine = rbind, 
+               .packages = c("clusterGeneration", "brglm")) %dorng% {
+                 start_time <- Sys.time()
+                 time_working <- difftime(Sys.time(), start_time, units = "auto")
+                 
+                 cat(paste("Working on DGP ", i, " of ", n_dgps, " after ", 
+                           round(time_working[[1]]),  " ", units(time_working), " of working. Random draw is ", runif(1), ".\n\n", sep = ""))
+                 simulate(n_sims = 2000)
+                 
+               }
+stopCluster(cl)
 
-saveRDS(df, file = "R/simulations/sample-size-simulations.RData")
+write_rds(df, path = "simulations/sample-size-simulations.rds")
 

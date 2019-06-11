@@ -1,0 +1,214 @@
+---
+title: "Computed Values"
+output: 
+  pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document computes and reports the quantities reported in the text of the `.tex` file.
+
+## "The Big Improvements from an Easy Solution"
+
+```{r message=FALSE, warning=FALSE}
+# load packages
+library(tidyverse)
+library(kableExtra)
+
+# load simulations
+sim_df <- read_rds("simulations/simulations.rds") %>%
+  glimpse()
+```
+
+### Bias
+
+```{r bias}
+
+# find largest bias scenario (will be for ML)
+max_bias_df <- sim_df %>%
+  filter(percent_bias == max(percent_bias)) 
+# make table for this scenario for ML and PML
+sim_df %>% 
+  filter(n == max_bias_df$n & k == max_bias_df$k & b0 == max_bias_df$b0) %>%
+  mutate(`Bias` = round(bias, 2), 
+         `% Bias` = scales::percent(percent_bias/100, accuracy = 1)) %>%
+  select(`Sample Size` = n, 
+         `Number of Other Covariates` = k, 
+         `Intercept` = b0, 
+         `Method` = method, 
+         `Bias`,
+         `% Bias`) %>%
+  kable(format = "latex", 
+        caption = "Largest Bias.",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+```{r}
+# smallest bias
+sim_df %>% 
+  filter(method == "ML") %>%
+  top_n(-1, percent_bias) %>%
+  mutate(`Bias` = round(bias, 2), 
+         `% Bias` = scales::percent(percent_bias/100, accuracy = 1)) %>%
+  select(`Sample Size` = n, 
+         `Number of Other Covariates` = k, 
+         `Intercept` = b0, 
+         `Method` = method, 
+         `Bias`,
+         `% Bias`)  %>%
+  kable(format = "latex", 
+        caption = "Smallest Bias",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+### Variance
+
+```{r var}
+# largest bias
+sim_df %>% 
+  select(n, k, b0, method, var) %>%
+  spread(method, var) %>%
+  mutate(var_infl = ML/PML - 1, 
+         var_infl_chr = scales::percent(var_infl, accuracy = 1)) %>%
+  filter(n %in% c(30, 60, 210) & b0 == -1)  %>%
+  select(-var_infl) %>%
+  select(`Sample Size` = n, 
+         `Number of Other Covariates` = k, 
+         `Intercept` = b0, 
+         `Variance Inflation` = var_infl_chr) %>%
+  kable(format = "latex", 
+        caption = "The Variance Inflation in Several Scenarios",
+        booktabs = TRUE, 
+        digits = 2) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+### MSE
+
+```{r mse}
+# largest bias
+mse_df <- sim_df %>% 
+  select(n, k, b0, method, mse) %>%
+  spread(method, mse) %>%
+  mutate(mse_infl = ML/PML - 1, 
+         mse_infl_chr = scales::percent(mse_infl, accuracy = 1))
+
+# largest mse inflation
+top_n(mse_df, 1, mse_infl)
+
+# percent of mse infl larger than 100%
+mse_df %>% 
+  summarize(`100%` = mean(mse_infl > 1), 
+            `50%` = mean(mse_infl > 0.5), 
+            `25%` = mean(mse_infl > 0.25)) %>%
+  gather(`MSE Infl. Threshold`, `% Above`, `100%`:`25%`) %>%
+  mutate(`% Above` = scales::percent(`% Above`, accuracy = 1))  %>%
+  kable(format = "latex", 
+        caption = "Percent of MSE Infl. Larger than 100\\%, 50\\%, and 25\\%.",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+```{r}
+# relative contribution of variance
+rc_df_bias <- sim_df %>%
+  select(n, k, b0, method, bias) %>%
+  spread(method, bias) %>%
+  rename(ml_bias = ML, pml_bias = PML)
+  
+rc_df_var <- sim_df %>%
+  select(n, k, b0, method, var) %>%
+  spread(method, var) %>%
+  rename(ml_var = ML, pml_var = PML)
+
+rc_df <- left_join(rc_df_bias, rc_df_var) %>%
+  mutate(var_contrib = 100*ml_var/(pml_var + pml_bias^2),
+         bias_contrib = 100*(ml_bias^2)/(pml_var + pml_bias^2),
+         rel_contrib = var_contrib/bias_contrib)
+
+rc_df %>%
+  filter(n %in% c(30, 210)) %>%
+  group_by(n) %>%
+  summarize(min = round(min(rel_contrib), 0),
+            max = round(max(rel_contrib), 0)) %>%
+  mutate(n = paste0("N = ", n)) %>%
+  rename(N = n, `Minimum` = min, `Maximum` = max) %>%
+  kable(format = "latex", 
+        caption = "Relative contribution of variance to MSE.",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+## "The Substantive Importance of the Big Improvements"
+
+```{r}
+# load coefficient estimates
+coef_df <- read_rds("ge-replication/coefficient-estimates.rds")
+
+# create table of percent changes
+coef_df %>%
+  select(var_name_print, model_name, est) %>%
+  spread(model_name, est) %>%
+  mutate(percent_decrease = scales::percent(PML/ML - 1, accuracy = 1)) %>%
+  rename(`Variable Name` = var_name_print, `ML Est.` = ML, `PML Est.` = PML, `% Decrease` = percent_decrease) %>%
+  kable(format = "latex", 
+        digits = 2,
+        caption = "Percent Difference in ML and PML Estimates",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+```{r}
+# load coefficient estimates
+osf_df <- read_rds("ge-replication/out-of-sample-fit.rds")
+
+# create table of percent changes
+osf_df %>%
+  spread(method, score) %>%
+  mutate(percent_decrease = scales::percent(PML/ML - 1, accuracy = 1)) %>%
+  rename(`Score Type` = score_type, `% Decrease` = percent_decrease) %>% 
+  kable(format = "latex", 
+        digits = 2,
+        caption = "Percent Decrease in ML and PML Out-of-Sample Fit",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+```{r}
+# load coefficient estimates
+pr_df <- read_rds("ge-replication/qi-probs.rds")
+
+# create table of percent changes
+pr_df %>%
+  spread(method, prob) %>% 
+  rename(`State Type` = st) %>% 
+  kable(format = "latex", 
+        digits = 2,
+        caption = "Probability of Conservative Decision",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+```{r}
+# load qi estimates
+fd_df <- read_rds("ge-replication/qi-fd.rds") %>%
+  mutate(QI = "First Difference") 
+
+rr_df <- read_rds("ge-replication/qi-rr.rds") %>%
+  mutate(QI = "Risk Ratio") 
+
+bind_rows(fd_df, rr_df) %>% 
+  select(-lwr_90, -upr_90) %>%
+  spread(method, est) %>% 
+  mutate(percent_decrease = scales::percent(PML/ML - 1, accuracy = 1)) %>%
+  rename(`% Decrease` = percent_decrease) %>%
+  kable(format = "latex", 
+        digits = 2,
+        caption = "Quantities of Interest",
+        booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```

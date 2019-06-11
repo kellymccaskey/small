@@ -1,6 +1,6 @@
 
+# load packages
 library(ggplot2)
-library(ggrepel)
 
 x <- seq(.1, 1, length.out = 1000)
 score_fn <- function(x) {

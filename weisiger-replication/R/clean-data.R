@@ -1,4 +1,8 @@
 
+# load packages
+library(tidyverse)
+library(arm)
+
 # load data
 cat("\nload orginial data...\n\n")
 weisiger_raw <- read_tsv("weisiger-replication/data/weisiger-raw.tab")
@@ -39,3 +43,4 @@ glimpse(weisiger)
 # write new data set
 cat("\nwrite new data set to file...\n")
 write_csv(weisiger, "weisiger-replication/data/weisiger.csv")
+

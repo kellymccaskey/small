@@ -12,5 +12,8 @@
 *.bib.bak
 *.docx
 *-old/
+memo/
+poster/
+present/
 !.gitignore
-deploy.R
+.Rproj.user
