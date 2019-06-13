@@ -69,9 +69,9 @@ added the annotations manually in Keynote.
   - The code automatically stores the packages used in the last run in
     the file `session-info.txt`.
   - There is no log file, but all the figures are created and saved in
-    the `manuscript/figs` directory.
-  - Note that `do-all.R` does not automatically re-compile the LaTeX
-    manuscript, so you need to do that manually.
+    the `manuscript/figs` directory. All quantities reported in the
+    manuscript are computed and/or reported in the file
+    `computed-values.pdf`.
 
 ## R
 
@@ -142,3 +142,30 @@ devtools::package_info(pkgs = c(pkg, "separation"), dependencies = TRUE) %>%
   select(package, version = ondiskversion, date, source) %>%
   write_csv("package-versions.csv")
 ```
+
+## Reproducing without `Make`
+
+  - To create `makefile-dag.png`, run the R script `makefile-dag.R`.
+  - To do the simulations for figures 2-5 and store them as
+    `simulations/simulations.rds`, run the R script `R/simulations.R`.
+  - To create the figures based on the simulations above, run the R
+    script `R/plot-simulations.R`. These figures are stored as `.pdf`s
+    in `manuscript/figs`.
+  - To perform the sample size simulations for figure 8 and store them
+    as `simulations/sample-size-simulations.rds`, run the R script
+    `R/sample-size-simulations.R`.
+  - To create the figures based on the sample size simulations above,
+    run `R/plot-sample-size-simulations.R`. These figures are stored as
+    `.pdf`s in `manuscript/figs`.
+  - To reproduce the George and Epstein re-analysis, run the R script
+    `ge-replication/R/analysis.R`. Figures are stored as `.pdf`s in
+    `manuscript/figs`.
+  - To reproduce the Weisiger re-analysis, run the R script
+    `weisiger-replication/R/analysis.R`. Figures are stored as `.pdf`s
+    in `manuscript/figs`.
+  - To compile the manuscript and appendix, compile
+    `manuscript/small.tex` and `manuscript/small-appendix.tex`,
+    respectively, with pdftex and bibtex.
+  - To render the `README.md`, compile `README.Rmd` with knitr.
+  - To render the `computed-values.pdf`, compile `computed-values.pdf`
+    with knitr.
