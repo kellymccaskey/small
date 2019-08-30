@@ -80,8 +80,12 @@ rep: computed-values.pdf README.md manuscript/small.pdf
 	cp README.Rmd project-directory
 	zip -r project-directory.zip project-directory
 	mkdir dataverse
-	cp project-directory.zip dataverse
+	mv project-directory.zip dataverse
 	cp README.md dataverse
+	cp manuscript/small.pdf dataverse
+	cp manuscript/small-appendix.pdf dataverse
+	cp ge-replication/data/ge.csv dataverse
+	cp weisiger-replication/data/weisiger.csv dataverse
 	zip -r dataverse.zip dataverse
 	rm -r dataverse
 	rm -r project-directory
