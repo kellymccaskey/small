@@ -1,5 +1,5 @@
 # phony
-all: dag sims simplots ge weisiger manuscript readme computedvalues
+all: dag sims simplots ge weisiger manuscript readme computedvalues rep
 	rm -f Rplots.pdf
 
 dag: makefile-dag.png
@@ -65,6 +65,27 @@ README.md: README.Rmd
 computed-values.pdf: computed-values.Rmd simulations/simulations.rds simulations/sample-size-simulations.rds ge-replication/R/analysis.R ge-replication/data/ge.csv
 	Rscript -e 'rmarkdown::render("$<")'	
 	rm -f computed-values.log
+	
+# make replication .zip file
+rep: computed-values.pdf README.md manuscript/small.pdf
+	rm -f dataverse.zip
+	mkdir project-directory
+	cp -R manuscript project-directory 
+	cp -R ge-replication project-directory 
+	cp -R simulations project-directory 
+	cp -R weisiger-replication project-directory
+	cp computed-values.pdf project-directory
+	cp computed-values.Rmd project-directory
+	cp README.md project-directory
+	cp README.Rmd project-directory
+	zip -r project-directory.zip project-directory
+	mkdir dataverse
+	cp project-directory.zip dataverse
+	cp README.md dataverse
+	zip -r dataverse.zip dataverse
+	rm -r dataverse
+	rm -r project-directory
+
 
 # cleaning phonys
 

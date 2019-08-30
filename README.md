@@ -88,14 +88,14 @@ R.version
     ## system         x86_64, darwin15.6.0        
     ## status                                     
     ## major          3                           
-    ## minor          5.3                         
+    ## minor          6.1                         
     ## year           2019                        
-    ## month          03                          
-    ## day            11                          
-    ## svn rev        76217                       
+    ## month          07                          
+    ## day            05                          
+    ## svn rev        76782                       
     ## language       R                           
-    ## version.string R version 3.5.3 (2019-03-11)
-    ## nickname       Great Truth
+    ## version.string R version 3.6.1 (2019-07-05)
+    ## nickname       Action of the Toes
 
 ## R Packages
 
@@ -107,12 +107,16 @@ code:
 # list of packages on CRAN used in this project (exclusing base packages)
 pkg <- c("brglm", 
          "brglm2", 
+         "clusterGeneration",
          "devtools",
          "doParallel", 
          "doRNG",
          "foreach", 
+         "ggraph",
          "gridExtra", 
          "gridExtra", 
+         "igraph",
+         "kableExtra",
          "logistf", 
          "quantreg", 
          "scoring", 
